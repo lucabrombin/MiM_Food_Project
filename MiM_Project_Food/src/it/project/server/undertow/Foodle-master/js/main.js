@@ -3,71 +3,25 @@ var best_result = {};
 var related_food = {};
 
 var socket;
+
 if (window.WebSocket) {
-    socket = new WebSocket("ws://localhost:8100/endpoint");
-    socket.onmessage = function (event) {
-        var chat = document.getElementById('chat');
-        var obj = JSON.parse(event.data);
-        var i = 0;
-        var dim = Object.keys(obj.imgs).length;
+  socket = new WebSocket("ws://localhost:8100/endpoint");
 
-        var classe = obj.imgs[0].classe;
-        var nameImg = "url('./img/"+classe+"/" + obj.imgs[0].img + "')";
-        $("#best_result").css("background-image", nameImg);
-        toggle_view();
-
-        parse_json_collection(obj);
-        var deck = create_deck();
-        show_best_result();
-        show_collection("collection", deck);
-        
-        /*for(i = 0; i < dim; i++){
-          var div = document.createElement('div');
-          var classe = obj.imgs[i].classe;
-          var nameImg = "url('./img/"+classe+"/" + obj.imgs[i].img + "')";
-          div.style.backgroundImage = nameImg;
-          div.style.width = "500";
-          div.style.height = "500";
-          div.style.display = "inline-block";
-          div.style.float="left";
-
-          chat.appendChild(div);
-        }*/
-        //chat.innerHTML = event.data + "<br />";
-    };
-} else {
-    alert("Your browser does not support Websockets. (Use Chrome)");
-}
-
-function encodeImageFileAsURL() {
-
-    var filesSelected = document.getElementById("filechooser").files;
-    if (filesSelected.length > 0) {
-        var fileToLoad = filesSelected[0];
-
-        var fileReader = new FileReader();
-
-        fileReader.onload = function(fileLoadedEvent) {
-            var srcData = fileLoadedEvent.target.result; // <--- data: base64
-            //var chat = document.getElementById('chat');
-            //chat.innerHTML = srcData;
-            socket.send(srcData)
-            var newImage = document.createElement('img');
-            newImage.src = srcData;
-
-            document.getElementById("imgTest").innerHTML = newImage.outerHTML;
-            //alert("Converted Base64 version is " + document.getElementById("imgTest").innerHTML);
-            //console.log("Converted Base64 version is " + document.getElementById("imgTest").innerHTML);
-        }
-        fileReader.readAsDataURL(fileToLoad);
-    }
+  socket.onmessage = function (event) {
+    parse_json_collection(event.data);
+    show_best_result();
+    show_collection("collection", create_deck());
+  };
+} 
+else {
+  alert("Your browser does not support Websockets.");
 }
 
 function create_card(title, img_url) {
   var li = $(document.createElement('li'));
   li.addClass("card");
-  var nameImg = "url('./img/"+title+"/" + img_url + "')";
-  li.css("background-image", nameImg);
+  li.css("background-image", "url('" + img_url + "')");
+  
   var p = $(document.createElement('p'));
   p.addClass("label");
   p.text(title);
@@ -84,14 +38,14 @@ function show_collection(collection_id, cards){
 }
 
 function show_best_result() {
-  $("#best_result_class > span").text(best_result.classe.replace('_', ' '))
+  $("#best_result_class > span").text(best_result.classe.replace(/_/g, ' '))
+  $("#best_result").css("background-image", "url('" + best_result.img + "')");
 }
 
 function create_deck() {
   var deck = [];
   related_food.forEach(function(food) {
-    //deck.push(create_card(food.classe.replace('_', ' '), food.img));
-    deck.push(create_card(food.classe, food.img));
+    deck.push(create_card(food.classe.replace(/_/g, ' '), food.img));
   });
   return deck;
 }
@@ -104,43 +58,14 @@ function parse_json_collection(data) {
 
 function submit_picture(){
   if (this.files && this.files[0]) {
-    //var reader = new FileReader();
-
     var fileToLoad = this.files[0];
     var fileReader = new FileReader();
 
     fileReader.onload = function(fileLoadedEvent) {
-        var srcData = fileLoadedEvent.target.result; // <--- data: base64
-        //var chat = document.getElementById('chat');
-        //chat.innerHTML = srcData;
-        socket.send(srcData)
-        //var newImage = document.createElement('img');
-        //newImage.src = srcData;
-
-        //document.getElementById("imgTest").innerHTML = newImage.outerHTML;
-        //alert("Converted Base64 version is " + document.getElementById("imgTest").innerHTML);
-        //console.log("Converted Base64 version is " + document.getElementById("imgTest").innerHTML);
+      var srcData = fileLoadedEvent.target.result; // <--- data: base64
+      socket.send(srcData)
     }
     fileReader.readAsDataURL(fileToLoad);
-
-    /*
-    reader.onload = function(e) {      
-
-      ///////
-      // actually all this stuff should be done in the callback after the upload 
-      // (THIS IS JUST FOR DEBUGGING!)
-      $("#best_result").css("background-image", "url('" + e.target.result + "')");
-      toggle_view();
-
-      // Testing...
-      parse_json_collection(test_msg);
-      var deck = create_deck();
-      show_best_result();
-      show_collection("collection", deck);
-      ///////
-    }
-    reader.readAsDataURL(this.files[0]);
-  }*/
   }
 }
 
