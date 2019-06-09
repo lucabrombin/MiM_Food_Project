@@ -6,6 +6,12 @@ if (window.WebSocket) {
         var obj = JSON.parse(event.data);
         var i = 0;
         var dim = Object.keys(obj.imgs).length;
+
+		var classe = obj.imgs[0].classe;
+        var nameImg = "url('./img/"+classe+"/" + obj.imgs[0].img + "')";
+        $("#best_result").css("background-image", nameImg);
+        toggle_view();
+
         for(i = 0; i < dim; i++){
           var div = document.createElement('div');
           var classe = obj.imgs[i].classe;
