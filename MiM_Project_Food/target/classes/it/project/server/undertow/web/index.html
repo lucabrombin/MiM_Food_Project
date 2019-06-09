@@ -1,0 +1,122 @@
+
+<html>
+    <head><title>Food</title>
+    <script>
+
+        var socket;
+        if (window.WebSocket) {
+            socket = new WebSocket("ws://localhost:8100/endpoint");
+            socket.onmessage = function (event) {
+                var chat = document.getElementById('chat');
+                var obj = JSON.parse(event.data);
+                var i = 0;
+                var dim = Object.keys(obj.imgs).length;
+                for(i = 0; i < dim; i++){
+                    var div = document.createElement('div');
+                    var classe = obj.imgs[i].classe;
+                	var nameImg = "url('./img/"+classe+"/" + obj.imgs[i].img + "')";
+                	div.style.backgroundImage = nameImg;
+                	div.style.width = "500";
+                	div.style.height = "500";
+                	div.style.display = "inline-block";
+                    div.style.float="left";
+                    
+                	chat.appendChild(div);
+                }
+                //chat.innerHTML = event.data + "<br />";
+            };
+        } else {
+            alert("Your browser does not support Websockets. (Use Chrome)");
+        }
+
+        function send(message) {
+            if (!window.WebSocket) {
+                return false;
+            }
+            if (socket.readyState == WebSocket.OPEN) {
+                //IMMAGINE CHE DEVO INVIARE AL SERVER
+                var blobFile = $('#filechooser').files[0];
+                //var imagefile = document.querySelector('#filechooser')
+                var formData = new FormData();
+                formData.append("imageFile", imagefile);
+                //socket.binaryData = "arraybuffer";
+                //var formdata = $('form').serialize();
+
+                //var chat = document.getElementById('chat');
+                //chat.innerHTML = chat;
+                var text = 'data';
+                //var obj = JSON.parse(text);
+                socket.send(formData);
+            } else {
+                alert("The socket is not open.");
+            }
+            return false;
+        }
+
+        function encodeImageFileAsURL() {
+
+            var filesSelected = document.getElementById("filechooser").files;
+            if (filesSelected.length > 0) {
+                var fileToLoad = filesSelected[0];
+
+                var fileReader = new FileReader();
+
+                fileReader.onload = function(fileLoadedEvent) {
+                    var srcData = fileLoadedEvent.target.result; // <--- data: base64
+                    //var chat = document.getElementById('chat');
+                    //chat.innerHTML = srcData;
+                    socket.send(srcData)
+                    var newImage = document.createElement('img');
+                    newImage.src = srcData;
+
+                    document.getElementById("imgTest").innerHTML = newImage.outerHTML;
+                    //alert("Converted Base64 version is " + document.getElementById("imgTest").innerHTML);
+                    //console.log("Converted Base64 version is " + document.getElementById("imgTest").innerHTML);
+                }
+                fileReader.readAsDataURL(fileToLoad);
+            }
+        }
+
+        function sendFile() {
+            var file = document.getElementById('filechooser').files[0];
+            //var file = document.querySelector('#filechooser');
+            socket.binaryType = "arraybuffer";
+            //ws.send('filename:'+file.name);
+            var reader = new FileReader();
+            var rawData = new ArrayBuffer();           
+            console.log(file.name);
+            reader.loadend = function() {
+            }
+            reader.onload = function(e) {
+                rawData = e.target.result;
+                socket.send(rawData);
+                
+                console.log("the File has been transferred.")
+                //ws.send('end');
+            }
+            reader.readAsArrayBuffer(file);
+        }  
+
+        function loadDoc() {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("demo").innerHTML =
+                this.responseText;
+                }
+            };
+            xhttp.open("POST", "ajax_info.txt", true);
+            xhttp.send();
+        }
+    </script>
+    <link rel="stylesheet" type="text/css" href="./style.css">
+    <script type="text/javascript" src="./lib/jquery-3.3.1.min.js"></script>
+    </head>
+    <body>
+        <div id="imgTest">
+        </div>
+        <input type="file" id="filechooser" />
+        <div id="myfile" onclick="encodeImageFileAsURL();">aaa</div>
+        <div id="chat">a</div>
+    </body>
+</html>
