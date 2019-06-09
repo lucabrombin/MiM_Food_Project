@@ -8,11 +8,11 @@ if (window.WebSocket) {
   socket = new WebSocket("ws://localhost:8100/endpoint");
 
   socket.onmessage = function (event) {
-
-    toggle_view()
     parse_json_collection(event.data);
     show_best_result();
     show_collection("collection", create_deck());
+    toggle_view();
+    toggle_loading();
   };
 } 
 else {
@@ -23,7 +23,7 @@ function create_card(title, img_url) {
   var li = $(document.createElement('li'));
   li.addClass("card");
 
-  var className = title.replace(" ", "_");
+  var className = title.replace(/ /g, "_");
   li.css("background-image", "url('" + "./img/" + className + "/" + img_url + "')");
   
   var p = $(document.createElement('p'));
@@ -69,6 +69,7 @@ function submit_picture(){
     fileReader.onload = function(fileLoadedEvent) {
       var srcData = fileLoadedEvent.target.result; // <--- data: base64
       socket.send(srcData)
+      toggle_loading();
     }
     fileReader.readAsDataURL(fileToLoad);
   }
@@ -90,3 +91,7 @@ $(function() {
     document.getElementById("img_uploader").click();
   });
 });
+
+function toggle_loading() {
+  $("#loading").toggle();
+}
