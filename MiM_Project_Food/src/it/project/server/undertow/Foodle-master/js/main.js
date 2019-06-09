@@ -8,6 +8,8 @@ if (window.WebSocket) {
   socket = new WebSocket("ws://localhost:8100/endpoint");
 
   socket.onmessage = function (event) {
+
+    toggle_view()
     parse_json_collection(event.data);
     show_best_result();
     show_collection("collection", create_deck());
@@ -20,7 +22,9 @@ else {
 function create_card(title, img_url) {
   var li = $(document.createElement('li'));
   li.addClass("card");
-  li.css("background-image", "url('" + img_url + "')");
+
+  var className = title.replace(" ", "_");
+  li.css("background-image", "url('" + "./img/" + className + "/" + img_url + "')");
   
   var p = $(document.createElement('p'));
   p.addClass("label");
@@ -38,8 +42,9 @@ function show_collection(collection_id, cards){
 }
 
 function show_best_result() {
-  $("#best_result_class > span").text(best_result.classe.replace(/_/g, ' '))
-  $("#best_result").css("background-image", "url('" + best_result.img + "')");
+  $("#best_result_class > span").text(best_result.classe.replace(/_/g, ' '));
+
+  $("#best_result").css("background-image", "url('" + "./img/" + best_result.classe + "/" + best_result.img + "')");
 }
 
 function create_deck() {
