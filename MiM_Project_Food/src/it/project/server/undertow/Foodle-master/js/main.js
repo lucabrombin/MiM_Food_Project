@@ -11,6 +11,7 @@ if (window.WebSocket) {
     parse_json_collection(event.data);
     show_best_result();
     show_collection("collection", create_deck());
+    toggle_view();
   };
 } 
 else {
@@ -21,7 +22,7 @@ function create_card(title, img_url) {
   var li = $(document.createElement('li'));
   li.addClass("card");
   li.css("background-image", "url('" + img_url + "')");
-  
+
   var p = $(document.createElement('p'));
   p.addClass("label");
   p.text(title);
