@@ -1,3 +1,7 @@
+var test_msg = '{"imgs":[{"img":"803481.jpg","classe":"beef_carpaccio"},{"img":"1242241.jpg","classe":"breakfast_burrito"},{"img":"3607592.jpg","classe":"breakfast_burrito"},{"img":"820545.jpg","classe":"bruschetta"},{"img":"206027.jpg","classe":"beef_carpaccio"},{"img":"212368.jpg","classe":"beef_carpaccio"},{"img":"1172580.jpg","classe":"bruschetta"},{"img":"3429450.jpg","classe":"bibimbap"},{"img":"3051510.jpg","classe":"bibimbap"},{"img":"1832620.jpg","classe":"beef_carpaccio"},{"img":"3503609.jpg","classe":"beef_carpaccio"},{"img":"2472060.jpg","classe":"baby_back_ribs"},{"img":"3348442.jpg","classe":"beef_carpaccio"},{"img":"3837961.jpg","classe":"baby_back_ribs"},{"img":"1191063.jpg","classe":"bibimbap"},{"img":"3766342.jpg","classe":"baklava"},{"img":"1585661.jpg","classe":"bread_pudding"},{"img":"3441400.jpg","classe":"breakfast_burrito"},{"img":"3660558.jpg","classe":"beef_carpaccio"},{"img":"318343.jpg","classe":"beet_salad"},{"img":"1162327.jpg","classe":"beef_carpaccio"},{"img":"2221152.jpg","classe":"beet_salad"},{"img":"2024914.jpg","classe":"baklava"},{"img":"3187646.jpg","classe":"bibimbap"},{"img":"374126.jpg","classe":"beet_salad"},{"img":"1600317.jpg","classe":"baklava"},{"img":"239826.jpg","classe":"beet_salad"},{"img":"1894239.jpg","classe":"beef_carpaccio"},{"img":"466260.jpg","classe":"baby_back_ribs"},{"img":"913291.jpg","classe":"beef_tartare"}]}';
+var best_result = {};
+var related_food = {};
+
 var socket;
 if (window.WebSocket) {
     socket = new WebSocket("ws://localhost:8100/endpoint");
@@ -7,12 +11,17 @@ if (window.WebSocket) {
         var i = 0;
         var dim = Object.keys(obj.imgs).length;
 
-		var classe = obj.imgs[0].classe;
+        var classe = obj.imgs[0].classe;
         var nameImg = "url('./img/"+classe+"/" + obj.imgs[0].img + "')";
         $("#best_result").css("background-image", nameImg);
         toggle_view();
 
-        for(i = 0; i < dim; i++){
+        parse_json_collection(obj);
+        var deck = create_deck();
+        show_best_result();
+        show_collection("collection", deck);
+        
+        /*for(i = 0; i < dim; i++){
           var div = document.createElement('div');
           var classe = obj.imgs[i].classe;
           var nameImg = "url('./img/"+classe+"/" + obj.imgs[i].img + "')";
@@ -23,7 +32,7 @@ if (window.WebSocket) {
           div.style.float="left";
 
           chat.appendChild(div);
-        }
+        }*/
         //chat.innerHTML = event.data + "<br />";
     };
 } else {
@@ -54,14 +63,11 @@ function encodeImageFileAsURL() {
     }
 }
 
-var test_msg = '{"imgs":[{"img":"803481.jpg","classe":"beef_carpaccio"},{"img":"1242241.jpg","classe":"breakfast_burrito"},{"img":"3607592.jpg","classe":"breakfast_burrito"},{"img":"820545.jpg","classe":"bruschetta"},{"img":"206027.jpg","classe":"beef_carpaccio"},{"img":"212368.jpg","classe":"beef_carpaccio"},{"img":"1172580.jpg","classe":"bruschetta"},{"img":"3429450.jpg","classe":"bibimbap"},{"img":"3051510.jpg","classe":"bibimbap"},{"img":"1832620.jpg","classe":"beef_carpaccio"},{"img":"3503609.jpg","classe":"beef_carpaccio"},{"img":"2472060.jpg","classe":"baby_back_ribs"},{"img":"3348442.jpg","classe":"beef_carpaccio"},{"img":"3837961.jpg","classe":"baby_back_ribs"},{"img":"1191063.jpg","classe":"bibimbap"},{"img":"3766342.jpg","classe":"baklava"},{"img":"1585661.jpg","classe":"bread_pudding"},{"img":"3441400.jpg","classe":"breakfast_burrito"},{"img":"3660558.jpg","classe":"beef_carpaccio"},{"img":"318343.jpg","classe":"beet_salad"},{"img":"1162327.jpg","classe":"beef_carpaccio"},{"img":"2221152.jpg","classe":"beet_salad"},{"img":"2024914.jpg","classe":"baklava"},{"img":"3187646.jpg","classe":"bibimbap"},{"img":"374126.jpg","classe":"beet_salad"},{"img":"1600317.jpg","classe":"baklava"},{"img":"239826.jpg","classe":"beet_salad"},{"img":"1894239.jpg","classe":"beef_carpaccio"},{"img":"466260.jpg","classe":"baby_back_ribs"},{"img":"913291.jpg","classe":"beef_tartare"}]}';
-var best_result = {};
-var related_food = {};
-
 function create_card(title, img_url) {
   var li = $(document.createElement('li'));
   li.addClass("card");
-  li.css("background-image", "url('" + img_url + "')");
+  var nameImg = "url('./img/"+title+"/" + img_url + "')";
+  li.css("background-image", nameImg);
   var p = $(document.createElement('p'));
   p.addClass("label");
   p.text(title);
@@ -84,7 +90,8 @@ function show_best_result() {
 function create_deck() {
   var deck = [];
   related_food.forEach(function(food) {
-    deck.push(create_card(food.classe.replace('_', ' '), food.img));
+    //deck.push(create_card(food.classe.replace('_', ' '), food.img));
+    deck.push(create_card(food.classe, food.img));
   });
   return deck;
 }
