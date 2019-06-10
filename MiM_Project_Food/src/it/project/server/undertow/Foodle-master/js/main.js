@@ -118,6 +118,7 @@ function toggle_loading() {
 }
 
 function open_url(url) {
+  console.log("Opening " + url);
   var win = window.open(url, '_blank');
   win.focus();
 }
