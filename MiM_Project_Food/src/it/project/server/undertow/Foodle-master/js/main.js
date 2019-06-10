@@ -65,7 +65,7 @@ function show_candidate_class() {
 function show_best_result() {
   $("#best_result").css("background-image", "url('" + "./img/" + best_result.classe + "/" + best_result.img + "')");
   $("#best_result").on('click', function() {
-    open_url("./img/" + best_result.classe + "/" + best_result.img);
+    open_url("/img/" + best_result.classe + "/" + best_result.img);
   });
 }
 
