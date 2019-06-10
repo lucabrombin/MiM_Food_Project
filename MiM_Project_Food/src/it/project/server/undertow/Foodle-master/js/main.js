@@ -42,14 +42,11 @@ function show_collection(collection_id, cards){
   });
 }
 
-function voting_candiate_class() {
+function voting_candiate_class(knn) {
   var counter = {};
 
-  var knn = collection.slice(0);
-  knn.unshift(best_result);
-
   knn.forEach(function(neighbour) {
-    counter[neighbour] = (counter[neighbour] == undefined)?1:counter[neighbour]+1;
+    counter[neighbour.classe] = (counter[neighbour.classe] == undefined)?1:counter[neighbour.classe]+1;
   });
   return Object.keys(counter).reduce(function(a, b){ return counter[a] > counter[b] ? a : b });
 }
@@ -69,6 +66,8 @@ function create_deck() {
 
 function parse_json_collection(data) {
   var imgs = JSON.parse(data).imgs;
+
+  candidate_class = voting_candiate_class(imgs)
   best_result = imgs.shift();
   related_food = imgs;
 }
