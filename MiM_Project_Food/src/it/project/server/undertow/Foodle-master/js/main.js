@@ -99,11 +99,8 @@ function toggle_view() {
 }
 
 $(function() {
-  
   $("header h1").on('click', toggle_view);
-  
   $("#img_uploader").on('change', submit_picture);
-
   $("#upload_button").on('click', function(){ 
     document.getElementById("img_uploader").click();
   });
