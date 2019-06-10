@@ -42,11 +42,16 @@ function show_collection(collection_id, cards){
   });
 }
 
-function voting_candiate_class(knn) {
+function voting_candiate_class() {
   var counter = {};
+
+  var knn = collection.slcie(0);
+  knn.unshift(best_result);
+
   knn.forEach(function(neighbour) {
     counter[neighbour] = (counter[neighbour] == undefined)?1:counter[neighbour]+1;
   });
+  
   return counter.sort()[0];
 }
 
