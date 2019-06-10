@@ -49,7 +49,7 @@ function voting_candiate_class(knn) {
   var counter = {};
 
   knn.forEach(function(neighbour) {
-    counter[neighbour.classe] = (counter[neighbour.classe] == undefined)?1:counter[neighbour.classe]+1;
+    counter[neighbour.classe] = (counter[neighbour.classe]+1) || 1;
   });
   return Object.keys(counter).reduce(function(a, b){ return counter[a] > counter[b] ? a : b });
 }
