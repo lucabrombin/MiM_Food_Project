@@ -10,8 +10,11 @@ if (window.WebSocket) {
 
   socket.onmessage = function (event) {
     parse_json_collection(event.data);
+
+    show_candidate_class();
     show_best_result();
     show_collection("collection", create_deck());
+    
     toggle_view();
     toggle_loading();
   };
@@ -51,8 +54,11 @@ function voting_candiate_class(knn) {
   return Object.keys(counter).reduce(function(a, b){ return counter[a] > counter[b] ? a : b });
 }
 
+function show_candidate_class() {
+  $("#best_result_class > span").text(candidate_class.replace(/_/g, ' '));
+}
+
 function show_best_result() {
-  $("#best_result_class > span").text(best_result.classe.replace(/_/g, ' '));
   $("#best_result").css("background-image", "url('" + "./img/" + best_result.classe + "/" + best_result.img + "')");
 }
 
