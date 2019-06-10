@@ -83,7 +83,7 @@ public class ServerHTTP {
                                         /*******DEEP LEARNING PHASE*******/
                                         //DATA UN'IMMAGINE PASSATA DAL CLIENT, RESTITUIRE LE K IMMAGINE PIU' SIMILI
                                         //DATA UN'IMMAGINE PASSATA DAL CLIENT, RESTITUIRE LA CLASSE DI APPARTENANZE
-                                        try (ElasticImgSearching imgSearch = new ElasticImgSearching(Parameters.PIVOTS_FILE, Parameters.TOP_K_QUERY)) {
+                                        try (ElasticImgSearching imgSearch = new ElasticImgSearching(Parameters.PIVOTS_FILE_GOOGLENET, Parameters.TOP_K_QUERY)) {
                                         	System.out.println("SEARCHING SIMILAR IMAGES..");
                                         	time = -System.currentTimeMillis();
                                         	

@@ -24,7 +24,7 @@ public class Pivots {
 	public static void main(String[] args) throws ClassNotFoundException, IOException {
 		List<ImgDescriptor> ids = FeaturesStorage.load(Parameters.STORAGE_FILE);
 		List<ImgDescriptor> pivs = Pivots.makeRandomPivots(ids, Parameters.NUM_PIVOTS);
-		FeaturesStorage.store(pivs, Parameters.PIVOTS_FILE);
+		FeaturesStorage.store(pivs, Parameters.PIVOTS_FILE_GOOGLENET);
 		
 		System.out.println("PIVOT SELECTED");
 	}

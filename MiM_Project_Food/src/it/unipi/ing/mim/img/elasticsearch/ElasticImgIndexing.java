@@ -33,7 +33,7 @@ public class ElasticImgIndexing implements AutoCloseable {
 	private RestHighLevelClient client;
 		
 	public static void main(String[] args) throws ClassNotFoundException, IOException {
-		try (ElasticImgIndexing esImgIdx = new ElasticImgIndexing(Parameters.PIVOTS_FILE, Parameters.STORAGE_FILE, Parameters.TOP_K_IDX)) {
+		try (ElasticImgIndexing esImgIdx = new ElasticImgIndexing(Parameters.PIVOTS_FILE_GOOGLENET, Parameters.STORAGE_FILE, Parameters.TOP_K_IDX)) {
 			esImgIdx.createIndex();
 			esImgIdx.index();	
 		}

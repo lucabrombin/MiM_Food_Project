@@ -42,7 +42,7 @@ public class ElasticImgSearching implements AutoCloseable {
 		
 	public static void main(String[] args) throws Exception {
 		
-		try (ElasticImgSearching imgSearch = new ElasticImgSearching(Parameters.PIVOTS_FILE, Parameters.TOP_K_QUERY)) {
+		try (ElasticImgSearching imgSearch = new ElasticImgSearching(Parameters.PIVOTS_FILE_GOOGLENET, Parameters.TOP_K_QUERY)) {
 			//Image Query File
 			File imgQuery = new File(Parameters.FOLDER_QUERY, "1003796.jpg");
 			
@@ -102,7 +102,7 @@ public class ElasticImgSearching implements AutoCloseable {
 		SearchRequest sr = composeSearch(queryString,k);
 		
 		
-		//perform elasticsearch search
+		//perform elasticsearch search 
 		SearchResponse searchResponse = client.search(sr,RequestOptions.DEFAULT); 
 		SearchHit[] hits = searchResponse.getHits().getHits();
 		
@@ -150,8 +150,6 @@ public class ElasticImgSearching implements AutoCloseable {
 	
 	//TODO
 	public List<ImgDescriptor> reorder(ImgDescriptor queryF, List<ImgDescriptor> res) throws IOException, ClassNotFoundException {
-		//Optional Step!!!
-		//LOOP
 		//for each result evaluate the distance with the query, call  setDist to set the distance, then sort the results
 		
 		double dist;

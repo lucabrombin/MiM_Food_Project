@@ -22,6 +22,7 @@ public class DNNExtractor {
 	
 	public DNNExtractor() {		
 		//Create the importer of Caffe framework network
+		//Importer importer = createCaffeImporter(new File(Parameters.DEEP_PROTO).getPath(), new File(Parameters.DEEP_MODEL).getPath());
 		net = readNetFromCaffe(new File(Parameters.DEEP_PROTO).getPath(), new File(Parameters.DEEP_MODEL).getPath());
         
         imgSize = new Size(Parameters.IMG_WIDTH, Parameters.IMG_HEIGHT);
