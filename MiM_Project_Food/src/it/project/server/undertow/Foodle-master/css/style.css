@@ -205,10 +205,11 @@ header .card {
   flex: none;
   margin: 0px 12px;
   text-align: left;
+  transition: box-shadow 0.3s ease-in-out;
 }
 
 #collection .card:hover {
-  box-shadow: 3px 17px 20px 9px rgba(111, 111, 111, 0.21);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
 .card .label {
