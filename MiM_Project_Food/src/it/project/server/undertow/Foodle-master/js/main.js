@@ -30,6 +30,10 @@ function create_card(title, img_url) {
   var className = title.replace(/ /g, "_");
   li.css("background-image", "url('" + "./img/" + className + "/" + img_url + "')");
   
+  li.on('click', function(){
+    open_url("./img/" + className + "/" + img_url);
+  });
+
   var p = $(document.createElement('p'));
   p.addClass("label");
   p.text(title);
@@ -60,6 +64,9 @@ function show_candidate_class() {
 
 function show_best_result() {
   $("#best_result").css("background-image", "url('" + "./img/" + best_result.classe + "/" + best_result.img + "')");
+  $("#best_result").on('click', function() {
+    open_url("./img/" + best_result.classe + "/" + best_result.img);
+  });
 }
 
 function create_deck() {
@@ -103,12 +110,6 @@ $(function() {
   $("#img_uploader").on('change', submit_picture);
   $("#upload_button").on('click', function(){ 
     document.getElementById("img_uploader").click();
-  });
-  $(".card").on('click', function() {
-    var url = $(this).css('background-image');
-    url = url.replace('url(','').replace(')','').replace(/\"/gi, "");
-    console.log(url);
-    open_url(url);
   });
 });
 
