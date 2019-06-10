@@ -154,6 +154,7 @@ header h1 {
   letter-spacing: normal;
   -webkit-font-smoothing: antialiased;
   text-transform: capitalize;
+  text-shadow: 1px 1px 3px #00000075;
 }
 
 
