@@ -104,8 +104,19 @@ $(function() {
   $("#upload_button").on('click', function(){ 
     document.getElementById("img_uploader").click();
   });
+  $(".card").on('click', function() {
+    var url = $(this).css('background-image');
+    url = url.replace('url(','').replace(')','').replace(/\"/gi, "");
+    console.log(url);
+    open_url(url);
+  });
 });
 
 function toggle_loading() {
   $("#loading").toggle();
+}
+
+function open_url(url) {
+  var win = window.open(url, '_blank');
+  win.focus();
 }

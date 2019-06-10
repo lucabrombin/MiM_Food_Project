@@ -121,6 +121,10 @@ h1 {
   text-align: left;
 }
 
+.card:hover {
+  cursor: pointer;
+}
+
 h2 {
   font-variant: none;
   text-align: left;
