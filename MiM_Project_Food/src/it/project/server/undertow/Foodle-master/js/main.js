@@ -51,13 +51,11 @@ function voting_candiate_class() {
   knn.forEach(function(neighbour) {
     counter[neighbour] = (counter[neighbour] == undefined)?1:counter[neighbour]+1;
   });
-
-  return counter.sort()[0];
+  return Object.keys(counter).reduce(function(a, b){ return counter[a] > counter[b] ? a : b });
 }
 
 function show_best_result() {
   $("#best_result_class > span").text(best_result.classe.replace(/_/g, ' '));
-
   $("#best_result").css("background-image", "url('" + "./img/" + best_result.classe + "/" + best_result.img + "')");
 }
 
