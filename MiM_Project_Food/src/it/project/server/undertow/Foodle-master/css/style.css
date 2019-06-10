@@ -178,6 +178,23 @@ header .card {
   border: 1px solid whitesmoke;
 }
 
+#best_result .label {
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: #60dc9e;
+  text-align: left;
+  padding: 0px 12px;
+  background: #fffffff7;
+  border: 2px solid;
+  width: auto;
+  display: inline-block;
+  margin: 10px;
+  border-radius: 10px;
+  letter-spacing: 1px;
+  font-variant: all-small-caps;
+  padding: 1px 5px 5px 5px;
+}
+
 #collection {
   list-style: none;
   min-height: 75vh;
