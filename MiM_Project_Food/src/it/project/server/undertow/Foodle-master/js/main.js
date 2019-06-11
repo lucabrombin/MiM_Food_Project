@@ -41,6 +41,32 @@ function create_card(title, img_url) {
   return li;
 }
 
+function show_related_classes() {
+  var classes_container = $("#classes");
+  classes_container.empty();
+
+  var related_classes = [];
+
+  related_classes.forEach(function (rel_class) {
+    var div = $(document).createElement('div');
+    var class_title = $(document).createElement('h3');
+    class_title.text(rel_class.name);
+    var collection = build_collection(rel_class.cards);
+    div.append(class_title);
+    div.append(collection);
+    classes_container.append(div);
+  });
+}
+
+function build_collection(collection, cards){
+  collection = $(document).createElement('ul');
+  collection.addClass("collection");
+  cards.forEach(function(card) {
+    collection.append(card);
+  });
+  return collection;
+}
+
 function show_collection(collection_id, cards){
   var collection = $('#'+collection_id);
   $(collection).empty();
