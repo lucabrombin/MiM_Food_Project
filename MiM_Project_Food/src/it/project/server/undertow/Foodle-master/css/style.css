@@ -32,7 +32,7 @@ h3 {
 
 .pill_button {
   border-radius: 30px;
-  background: transparent;
+  background: white;
   border: 2px solid rgb(35, 219, 157);
   color: rgb(36, 219, 158);
   font-size: 16px;
