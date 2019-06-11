@@ -14,11 +14,13 @@ import it.unipi.ing.mim.deep.DNNExtractor;
 import it.unipi.ing.mim.deep.ImgDescriptor;
 import it.unipi.ing.mim.deep.Parameters;
 import it.unipi.ing.mim.img.elasticsearch.ElasticImgSearching;
+import it.unipi.ing.mim.deep.tools.KnnClassifier;
 
 import static io.undertow.Handlers.path;
 import static io.undertow.Handlers.resource;
 import static io.undertow.Handlers.websocket;
 
+import org.apache.http.HttpResponse;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.json.*;
 
@@ -30,6 +32,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import sun.misc.BASE64Decoder;
 
@@ -84,6 +87,7 @@ public class ServerHTTP {
                                         //DATA UN'IMMAGINE PASSATA DAL CLIENT, RESTITUIRE LE K IMMAGINE PIU' SIMILI
                                         //DATA UN'IMMAGINE PASSATA DAL CLIENT, RESTITUIRE LA CLASSE DI APPARTENANZE
                                         try (ElasticImgSearching imgSearch = new ElasticImgSearching(Parameters.PIVOTS_FILE_GOOGLENET, Parameters.TOP_K_QUERY)) {
+                                        	
                                         	System.out.println("SEARCHING SIMILAR IMAGES..");
                                         	time = -System.currentTimeMillis();
                                         	
@@ -103,16 +107,57 @@ public class ServerHTTP {
                                 			//CERCO LE K IMMAGINI SIMILI ALLA QUERY PASSATA IN INGRESSO
                                 			List<ImgDescriptor> res = imgSearch.search(query, Parameters.K);
 
-                                			//Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML_ELASTIC);
+                                			//CLASIFICATION DELLA QUERY UTILIZZANDO IL RISULTATO DELLA RICERCA
+                                			KnnClassifier knn = new KnnClassifier();
+                                			String predictedClass = knn.classify(res, Parameters.K);
+                                			System.out.println("PREDICTED CLASS: " + predictedClass);
                                 			
+                                			//LISTA DELLE CLASSI ORDINATA PER CONFIDENCE 
+                                			Map<String,Double> sortedLListedClass = knn.getClassWithConfidence(res, Parameters.K);
+                                			                                			
                                 			//ORDINO IL RISULTATO DELLA RICERCA IN BASE ALLA SIMILARITY
                                 			System.out.println("REORDERING..");
                                 			res = imgSearch.reorder(query, res);                          			
                                 			
                                 			JsonObject result = new JsonObject(); 
+                                			JsonArray classe = new JsonArray();
                                 			JsonArray img = new JsonArray();
                                 			
-                                			for (int i = 0; i < res.size(); i++) {
+                                			result.addProperty("predicted_class", predictedClass);
+                                			
+                                			boolean isTheBestClass = true;
+                                			String bestResult = "not found";
+                                			for (Map.Entry<String, Double> entry : sortedLListedClass.entrySet()) {
+                                				JsonObject similar = new JsonObject();
+                                				String foodClass = entry.getKey();
+                                			    Double conf = entry.getValue();
+                                			    
+                                			    similar.addProperty("class", foodClass);
+                                			    similar.addProperty("confindence", conf);
+                                			    
+                                			    JsonArray urls = new JsonArray();
+                                			    for (int i = 0; i < res.size(); i++) {
+                                			    	if(isTheBestClass) {
+                                			    		bestResult = res.get(i).getId();
+                                			    		isTheBestClass = false;
+                                			    	} else {
+                                			    		if(res.get(i).getFoodClass().equals(foodClass)) {
+                                    			    		urls.add(res.get(i).getId());
+                                    			    	}
+                                			    	}                             			    	
+                                			    
+                                			    similar.add("imgs", urls);
+                                			    
+                                			    }
+                                			    
+                                			    classe.add(similar);
+                                			    //System.out.println(classe + " - " + conf);
+                                			 }
+                                			
+                                			result.addProperty("best_result", bestResult);
+                                			result.add("related_classes", classe);
+                                			
+                                			/*for (int i = 0; i < res.size(); i++) {
                                 				JsonObject similar = new JsonObject();
                                 				//System.out.println(i + " - " + (float) res.get(i).getDist() + "\t" + res.get(i).getId() + "\t" + res.get(i).getFoodClass() );
                                 				String nameFieldImg = "img";
@@ -121,8 +166,8 @@ public class ServerHTTP {
                                 				similar.addProperty(nameFieldClass, res.get(i).getFoodClass());
                                 				img.add(similar);
                                 			}
-                                			result.add("imgs", img);
-                                			//System.out.println(result.toString());
+                                			result.add("imgs", img);*/
+                                			System.out.println(result.toString());
                                 			messageData = result.toString();
                                 			                                			
                                         } catch (ClassNotFoundException | ParseException e) {
@@ -132,7 +177,7 @@ public class ServerHTTP {
 											//QUI ELABORIAMO IL RISULTATO DELLA RICERCA E PASSIAMO IL RISULATTO AL CLIENT
 											//IL RISULTATO SARA' MANDANTO CON UN JSON
 											System.out.println("SENDING RESULTS..");
-											System.out.println("SEND: " + messageData);
+											//System.out.println("SEND: " + messageData);
                                             for (WebSocketChannel session : channel.getPeerConnections()) {
                                                 WebSockets.sendText(messageData, session, null);
                                             }
