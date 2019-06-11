@@ -26,6 +26,7 @@ h3 {
   text-align: left;
   padding-left: 20px;
   color: #5d6368;
+  text-transform: capitalize;
 }
 
 .pill_button {
@@ -208,7 +209,7 @@ header .card {
 
 .collection {
   list-style: none;
-  min-height: 75vh;
+  /* min-height: 75vh; */
   padding: 0;
   /* padding: 8px; */
   margin-bottom: 20px;
@@ -216,7 +217,9 @@ header .card {
   overflow-x: scroll;
   overflow-y: visible;
   padding-top: 20px;
+  padding-bottom: 20px;
   margin-top: 0;
+  /* height: auto; */
 }
 
 .collection .card {
