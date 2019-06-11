@@ -1,4 +1,5 @@
 var test_msg = '{"predicted_class":"bruschetta","best_result":"1087448.jpg","related_classes":[{"class":"bruschetta","confidence":83.33332824707031,"imgs":["3375972.jpg","3496454.jpg","770896.jpg","1545121.jpg","3849230.jpg","142836.jpg","3805917.jpg","3585467.jpg","3838937.jpg","3101709.jpg","447701.jpg","827942.jpg","3437632.jpg","2450629.jpg","2411864.jpg","848012.jpg","3276541.jpg","537494.jpg","1607884.jpg","839902.jpg","2626162.jpg","1436597.jpg","3696447.jpg","3653732.jpg"]},{"class":"beef_carpaccio","confidence":16.666667938232422,"imgs":["1393529.jpg","1488494.jpg","3622185.jpg","127274.jpg","2098481.jpg"]}]}';
+
 var best_result = {};
 var related_food = {};
 var candidate_class = "";
@@ -47,7 +48,10 @@ function show_related_classes() {
   related_food.forEach(function (rel_class) {
     var div = $(document.createElement('div'));
     var class_title = $(document.createElement('h3'));
-    class_title.text(rel_class.class.replace(/_/g, ' ') + " " + rel_class.confidence.toFixed(2));
+    class_title.text(rel_class.class.replace(/_/g, ' '));
+    var confidence = $(document.createElement('p'));
+    confidence.addClass('confidence');
+    confidence.text("Confidence: " + rel_class.confidence.toFixed(2) + "%");
     var collection = build_collection(create_deck(rel_class));
     div.append(class_title);
     div.append(collection);
