@@ -49,9 +49,9 @@ function show_collection(collection_id, cards){
   });
 }
 
-function voting_candiate_class(knn) {
+function voting_candiate_class(knn, k = 10) {
   var counter = {};
-
+  knn = knn.slice(0, k);
   knn.forEach(function(neighbour) {
     counter[neighbour.classe] = (counter[neighbour.classe]+1) || 1;
   });
