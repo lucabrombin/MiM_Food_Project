@@ -32,19 +32,30 @@ h3 {
 
 .pill_button {
   border-radius: 30px;
-  background: rgb(35, 219, 157);
-  border: 2px solid rgb(78, 195, 156);
-  color: rgb(255, 255, 255);
+  background: transparent;
+  border: 2px solid rgb(35, 219, 157);
+  color: rgb(36, 219, 158);
   font-size: 16px;
   padding: 12px;
   outline: none;
   cursor: pointer;
   font-weight: bolder;
   box-shadow: 3px 3px 15px 0px rgba(111, 111, 111, 0.32);
+  transition: all 0.3s ease-in-out;
 }
 
 .pill_button:hover {
   box-shadow: 3px 17px 20px 6px rgba(111, 111, 111, 0.21);
+  background-color: #24db9e;
+  color: white;
+  margin-top: -2px;
+  border-color: white;
+}
+
+.pill_button:active {
+  /* border-style: inherit; */
+  margin-top: 2px;
+  background: #2b9471;
 }
 
 .pill_button:i {
