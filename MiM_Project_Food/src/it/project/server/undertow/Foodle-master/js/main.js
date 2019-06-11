@@ -54,6 +54,7 @@ function show_related_classes() {
     confidence.text("Confidence: " + rel_class.confidence.toFixed(2) + "%");
     var collection = build_collection(create_deck(rel_class));
     div.append(class_title);
+    div.append(confidence);
     div.append(collection);
     classes_container.append(div);
   });
