@@ -42,7 +42,7 @@ function create_card(title, img_url) {
 }
 
 function show_related_classes() {
-  var classes_container = $("#classes");
+  var classes_container = $("#related_classes_container");
   classes_container.empty();
 
   var related_classes = [];
