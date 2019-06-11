@@ -133,21 +133,20 @@ public class ServerHTTP {
                                 			    Double conf = entry.getValue();
                                 			    
                                 			    similar.addProperty("class", foodClass);
-                                			    similar.addProperty("confindence", conf);
+                                			    similar.addProperty("confidence", conf);
                                 			    
                                 			    JsonArray urls = new JsonArray();
                                 			    for (int i = 0; i < res.size(); i++) {
-                                			    	if(isTheBestClass) {
-                                			    		bestResult = res.get(i).getId();
-                                			    		isTheBestClass = false;
-                                			    	} else {
-                                			    		if(res.get(i).getFoodClass().equals(foodClass)) {
+                                			    	
+                            			    		if(res.get(i).getFoodClass().equals(foodClass)) {
+                            			    			if(isTheBestClass) {
+                                    			    		bestResult = res.get(i).getId();
+                                    			    		isTheBestClass = false;
+                                    			    	} else {
                                     			    		urls.add(res.get(i).getId());
                                     			    	}
-                                			    	}                             			    	
-                                			    
-                                			    similar.add("imgs", urls);
-                                			    
+                                			    	}                             			    	                                			    
+                                			    similar.add("imgs", urls);                              			    
                                 			    }
                                 			    
                                 			    classe.add(similar);
