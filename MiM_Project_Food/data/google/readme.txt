@@ -1,0 +1,1 @@
+qui dentro ci va BVLC_googlenet.caffemodel e il deploy.prototxt
