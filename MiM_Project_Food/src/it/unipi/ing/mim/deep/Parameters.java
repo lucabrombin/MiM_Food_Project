@@ -25,8 +25,8 @@ public class Parameters {
 	//public static final String DEEP_LAYER = "fc7"; 					
 	
 	//PER BVLC
-	//public static final int IMG_WIDTH = 224;
-	//public static final int IMG_HEIGHT = 224;
+	//public static final int IMG_WIDTH = 227;
+	//public static final int IMG_HEIGHT = 227;
 	
 	//PER VGG e GOOGLENET
 	public static final int IMG_WIDTH = 224;
@@ -51,13 +51,13 @@ public class Parameters {
 	public static final File  PIVOTS_FILE_VGG = new File("out/deep.vgg.pivots.dat");
 	
 	//Number Of Pivots
-	public static final int NUM_PIVOTS = 100;
+	public static final int NUM_PIVOTS = 1000;
 
 	//Top K pivots For Indexing
-	public static final int TOP_K_IDX = 50; //DA VEDEREEEE
+	public static final int TOP_K_IDX = 100; //DA VEDEREEEE
 	
 	//Top K pivots For Searching
-	public static final int TOP_K_QUERY = 10;
+	public static final int TOP_K_QUERY = 50;
 	
 	//Lucene Index
 	public static final String INDEX_NAME = "fooddeep_googlenet";

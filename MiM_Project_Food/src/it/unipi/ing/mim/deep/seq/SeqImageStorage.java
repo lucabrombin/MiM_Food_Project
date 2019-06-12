@@ -33,9 +33,9 @@ public class SeqImageStorage {
 		DNNExtractor extractor = new DNNExtractor();
 		
 		// PER OGNUNA DELLE 101 CLASSI
-		// HO MESSO 11 PERCHE ALTRIMENTI 101 CLASSI NON MI ENTRAVANO IN MEMORIA
+		// HO MESSO 40 PERCHE ALTRIMENTI 101 CLASSI NON MI ENTRAVANO IN MEMORIA
 		// VA MESSO dir.length
-		for (int k = 0; k < 11; k++) {
+		for (int k = 0; k < 40; k++) {
 			
 			File[] files = dir[k].listFiles();
 			

@@ -30,6 +30,8 @@ public class KnnClassifier {
 		String label;
 		int value;
 		int numberOfClass = 0;
+		
+		/******EVALUATE PREDICTED CLASS BY VOTING******/
 		for(int i = 0; i < k; i++){
 			ImgDescriptor descriptor = ids.get(i);
 			label = descriptor.getFoodClass();
@@ -47,6 +49,11 @@ public class KnnClassifier {
 		
 		//PRENDO LA CLASSE CON L'OCCORRENZA MAGGIORE NEL SET, SARA' LA PREDICTED CLASS
 		this.predictedClass=Collections.max(resultMap.entrySet(), (res1, res2) -> res1.getValue() - res2.getValue()).getKey();
+		/**********************************************/
+		
+		//TODO
+		/******EVALUATE PREDICTED CLASS BY WEIGHTED VOTING******/
+		/*******************************************************/
 		
 		//CALCOLO LA PERCENTIALE DI APPARTNENZA SULLA CLASSE PREDETTA DELLA QUERY RISPETTO A TUTTE LE K CLASSI
 		value = resultMap.get(this.predictedClass);
@@ -94,20 +101,4 @@ public class KnnClassifier {
 		return sorted;
 	}
 	
-	/*public String classifyTest(List<ImgDescriptor> ids, int k){
-		LinkedHashMap<String,Integer> resultMap=new LinkedHashMap<String,Integer>();
-		String label;
-		int value;
-		for(int i = 0; i < k; i++){
-			ImgDescriptor descriptor = ids.get(i);
-			label=descriptor.getFoodClass();
-			if(!resultMap.containsKey(label))
-				resultMap.put(descriptor.getFoodClass(),0);
-			value=resultMap.get(label);
-			resultMap.replace(label,value+1);
-		}
-		this.predictedClass=Collections.max(resultMap.entrySet(), (res1, res2) -> res1.getValue() - res2.getValue()).getKey();		
-		return this.predictedClass;
-	}*/
-
 }

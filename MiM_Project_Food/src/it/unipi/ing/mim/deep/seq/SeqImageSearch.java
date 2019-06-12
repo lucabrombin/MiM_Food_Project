@@ -51,7 +51,7 @@ public class SeqImageSearch {
 			descriptors.get(i).distance(queryF);
 		}
 		time += System.currentTimeMillis();
-		System.out.println(time + " ms");
+		//System.out.println(time + " ms");
 
 		Collections.sort(descriptors);
 		

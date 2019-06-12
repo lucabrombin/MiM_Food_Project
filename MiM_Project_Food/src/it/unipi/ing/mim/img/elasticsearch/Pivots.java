@@ -53,9 +53,8 @@ public class Pivots {
 		
 		StringBuilder sb = new StringBuilder();
 		//perform a sequential search to get the topK most similar pivots
-		List<ImgDescriptor> topKPivots = seqPivots.search(imgF, topK);
 		
-		//System.out.println(topKPivots.size());
+		List<ImgDescriptor> topKPivots = seqPivots.search(imgF, topK);
 		
 		//LOOP
 			//compose the text string using pivot ids
