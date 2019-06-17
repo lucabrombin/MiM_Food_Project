@@ -1,6 +1,6 @@
 package it.unipi.ing.mim.deep;
 
-import java.awt.image.BufferedImage;
+//import java.awt.image.BufferedImage;
 import java.io.File;
 
 import org.bytedeco.javacpp.indexer.FloatRawIndexer;
@@ -12,6 +12,8 @@ import org.bytedeco.opencv.opencv_dnn.*;
 import static org.bytedeco.opencv.global.opencv_dnn.*;
 import static org.bytedeco.opencv.global.opencv_imgcodecs.imread;
 import static org.bytedeco.opencv.global.opencv_imgproc.resize;
+
+// This class extracts the features of a single image using a certain DEEP_PROTO and a certain DEEP_MODEL
 
 public class DNNExtractor {
 
@@ -40,14 +42,18 @@ public class DNNExtractor {
 	
 	public float[] extract(Mat img, String layer) {
 		resize(img, img, imgSize);
-		// Convert Mat to dnn::Blob image batch
+		
+		// converts Mat to dnn::Blob image batch
 		Mat inputBlob = blobFromImage(img);
-		// set the network input
+		
+		// sets the input of the network
 		net.setInput(inputBlob, "data", 1.0, meanValues);
-		// compute output
+		
+		// computes the output
 		Mat prob = net.forward(layer);
 		float[] features = new float[(int) prob.total()];
-		// gather output of "fc7" layer
+		
+		// gathers the output of "fc7" layer
 		((FloatRawIndexer) prob.createIndexer()).get(0, features);
 		return features;
 	}

@@ -6,11 +6,14 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 
 	private static final long serialVersionUID = 1L;
 	
-	private float[] normalizedVector; // image feature
+	// unique id of the image (usually file name)
+	private String id; 
 	
-	private String id; // unique id of the image (usually file name)
+	// used for sorting purposes
+	private double dist; 
 	
-	private double dist; // used for sorting purposes
+	// image features
+	private float[] normalizedVector; 
 	
 	private String foodClass; 
 	
@@ -31,12 +34,16 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 		return id;
 	}
     
+    public void setId(String id) {
+		this.id = id;
+	}
+    
     public String getFoodClass() {
 		return foodClass;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+    public void setFoodClass(String foodClass) {
+		this.foodClass = foodClass;
 	}
 
 	public double getDist() {
@@ -47,13 +54,13 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 		this.dist = dist;
 	}
 
-	// compare with other friends using distances
+	// compares with other friends using distances
 	@Override
 	public int compareTo(ImgDescriptor arg0) {
 		return Double.valueOf(dist).compareTo(arg0.dist);
 	}
 	
-	//evaluate Euclidian distance
+	// evaluates Euclidean distance
 	public double distance(ImgDescriptor desc) {
 		
 		//System.out.println("Distance");
@@ -68,7 +75,7 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 		return dist;
 	}
 	
-	//Normalize the vector values 
+	// normalizes values of the vector
 	private float[] getNormalizedVector(float[] vector, float norm) {
 		if (norm != 0) {
 			for (int i = 0; i < vector.length; i++) {
@@ -78,7 +85,7 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 		return vector;
 	}
 	
-	//Norm 2
+	// computes norm2
 	private float evaluateNorm2(float[] vector) {
 		float norm2 = 0;
 		for (int i = 0; i < vector.length; i++) {
@@ -88,5 +95,10 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 		
 		return norm2;
 	}
+	
+	@Override
+    public String toString() {
+        return "ImgDescriptor [id=" + id + ", dist=" + dist + ", normalizedVector" + normalizedVector.toString() + ", foodClass=" + foodClass + "]";
+    }
     
 }

@@ -60,7 +60,7 @@ public class TestClassification {
 				
 				File imgQuery = new File(""+files[i]);
 
-				try (ElasticImgSearching imgSearch = new ElasticImgSearching(Parameters.PIVOTS_FILE_GOOGLENET, Parameters.TOP_K_QUERY)) {
+				try (ElasticImgSearching imgSearch = new ElasticImgSearching(Parameters.PIVOTS_FILE_GOOGLENET, Parameters.STORAGE_FILE, Parameters.TOP_K_QUERY)) {
 					//ESTRAGGO LE FEATURE DELLA QUERY
 					float[] imgFeatures = extractor.extract(imgQuery, Parameters.DEEP_LAYER);
 					//L'ULTIMO PARAMETRO SERVER PER DEFINIRE LA CLASSE DELLA QUERY
@@ -72,7 +72,10 @@ public class TestClassification {
 					//CLASIFICATION DELLA QUERY UTILIZZANDO IL RISULTATO DELLA RICERCA
 					KnnClassifier knn = new KnnClassifier();
 					//10-NN CLASSIFIER
-					String predictedClass = knn.classify(res, 10);
+					knn.classify(res);
+					String predictedClass = knn.getPredictedClass();
+					
+					//String predictedClass = knn.classify(res, 10);
 					
 					if(predictedClass.equals(actual_class)) {
 						matchedClass++;

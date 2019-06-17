@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpHost;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+//import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.RequestOptions;
@@ -15,13 +15,15 @@ import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
-import org.elasticsearch.client.indices.GetIndexRequest;
+//import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.settings.Settings.Builder;
 
 import it.unipi.ing.mim.deep.ImgDescriptor;
 import it.unipi.ing.mim.deep.Parameters;
 import it.unipi.ing.mim.deep.tools.FeaturesStorage;
+
+// This class creates the index on Elasticsearch using the previously computed pivots 
 
 public class ElasticImgIndexing implements AutoCloseable {
 	
@@ -36,62 +38,68 @@ public class ElasticImgIndexing implements AutoCloseable {
 		try (ElasticImgIndexing esImgIdx = new ElasticImgIndexing(Parameters.PIVOTS_FILE_GOOGLENET, Parameters.STORAGE_FILE, Parameters.TOP_K_IDX)) {
 			esImgIdx.createIndex();
 			esImgIdx.index();	
-		}
-		
+		}		
 	}
 	
-	//TODO
-	public ElasticImgIndexing(File pivotsFile, File datasetFile, int topKIdx) throws IOException, ClassNotFoundException {
-		//Initialize pivots, imgDescDataset, REST
+	// constructor
+	public ElasticImgIndexing(File pivotsFile, File datasetFile, int k) throws IOException, ClassNotFoundException {
+		// loads pivots 
 		pivots = new Pivots(pivotsFile);
-		imgDescDataset = FeaturesStorage.load(datasetFile);
-		this.topKIdx = topKIdx;
 		
-		RestClientBuilder builder = RestClient.builder(new HttpHost("localhost",9200,"http"));
+		// loads extracted features
+		imgDescDataset = FeaturesStorage.load(datasetFile);
+		topKIdx = k;
+		
+		// initializes the REST client to interact with Elasticsearch
+		RestClientBuilder builder = RestClient.builder(new HttpHost("localhost", 9200, "http"));
 		client = new RestHighLevelClient(builder);
 	}
 	
-	//TODO
+	// closes the REST client
 	public void close() throws IOException {
-		//close REST client
 		client.close();
 	}
 	
-	//TODO
+	// creates the Elasticsearch index
 	public void createIndex() throws IOException {
-		//Create the Elasticsearch index
 		IndicesClient idx = client.indices();
-		CreateIndexRequest request = new CreateIndexRequest (Parameters.INDEX_NAME);
-		Builder s = Settings.builder().put("index.number_of_shards",1).put("index.number_of_replicas",0).put("analysis.analyzer.first.type","whitespace");
+		CreateIndexRequest request = new CreateIndexRequest(Parameters.INDEX_NAME);
+		
+		// index has 1 shard, 0 replica and uses the whitespace analyzer
+		Builder s = Settings.builder()
+		  .put("index.number_of_shards", 1)
+		  .put("index.number_of_replicas", 0)
+		  .put("analysis.analyzer.first.type", "whitespace");
 	
 		request.settings(s);
-		idx.create(request,RequestOptions.DEFAULT);
+		idx.create(request, RequestOptions.DEFAULT);
 		
-		System.out.println("INDEX CREATED");
+		System.out.println("-- DEBUG -- Index created");
 	}
 	
-	//TODO
+	// indices all the extracted features into the Elasticsearch index
 	public void index() throws IOException {
-		//LOOP
-			//index all dataset features into Elasticsearch
 		IndexRequest request;
 		
+		// in each request to index a feature are specified:
+		// - the id of the feature
+		// - the text format of the feature, computed using features2text method of Pivots class
+		// - the class of the feature
 		for(ImgDescriptor el: imgDescDataset) {
-			request = composeRequest(el.getId(),pivots.features2Text(el, topKIdx), el.getFoodClass());
-			client.index(request,RequestOptions.DEFAULT);
+			System.out.println("-- DEBUG -- Indexing image " + el.getId());
+			request = composeRequest(el.getId(), pivots.features2Text(el, topKIdx), el.getFoodClass());
+			client.index(request, RequestOptions.DEFAULT);
 		}
 	}
 	
-	//TODO
+	// initializes and fills IndexRequest object with the id, the text format and the class of the feature
 	private IndexRequest composeRequest(String id, String imgTxt, String foodClass){			
-		//Initialize and fill IndexRequest Object with Fields.ID and Fields.IMG txt
-		IndexRequest request = new IndexRequest(Parameters.INDEX_NAME,"doc");
+		IndexRequest request = new IndexRequest(Parameters.INDEX_NAME, "doc");
 		
 		Map<String,Object> jsonMap = new HashMap<>();
 		jsonMap.put(Fields.ID, id);
 		jsonMap.put(Fields.IMG, imgTxt);
 		jsonMap.put(Fields.FOOD_CLASS, foodClass);
-		
 		request.source(jsonMap);
 		
 		return request;

@@ -28,22 +28,24 @@ import it.unipi.ing.mim.deep.seq.SeqImageSearch;
 import it.unipi.ing.mim.deep.tools.FeaturesStorage;
 import it.unipi.ing.mim.deep.tools.Output;
 
+// This class extracts the features for a given image and search for k most similar images
+
 public class ElasticImgSearching implements AutoCloseable {
 
 	private RestHighLevelClient client;
 	
 	private Pivots pivots;
 	
-	private int topKSearch;
+	private int topKSearch;	
 	
 	private Map<String,ImgDescriptor> imgDescMap;
 	
-	private static String foodClass;
+	//private static String foodClass;
 		
-	public static void main(String[] args) throws Exception {
-		
+	/*
+	public static void main(String[] args) throws Exception {	
 		try (ElasticImgSearching imgSearch = new ElasticImgSearching(Parameters.PIVOTS_FILE_GOOGLENET, Parameters.TOP_K_QUERY)) {
-			//Image Query File
+			// image query file
 			File imgQuery = new File(Parameters.FOLDER_QUERY, "1003796.jpg");
 			
 			foodClass = "bruschetta";
@@ -53,108 +55,100 @@ public class ElasticImgSearching implements AutoCloseable {
 			float[] imgFeatures = extractor.extract(imgQuery, Parameters.DEEP_LAYER);
 			
 			ImgDescriptor query = new ImgDescriptor(imgFeatures, imgQuery.getName(), foodClass);
-					
-			//long time = -System.currentTimeMillis();
+			
 			List<ImgDescriptor> res = imgSearch.search(query, Parameters.K);
-			//time += System.currentTimeMillis();
-			//System.out.println("Search time: " + time + " ms");
 			
 			Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML_ELASTIC);
-			
-			//Uncomment for the optional step
+					
 			res = imgSearch.reorder(query, res);
 			Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML_REORDERED);
 		}
-	}
+	}*/
 	
-	//TODO
-	public ElasticImgSearching(File pivotsFile, int topKSearch) throws ClassNotFoundException, IOException {
-		//Initialize pivots, imgDescMap, REST
-		
+	// constructor
+	public ElasticImgSearching(File pivotsFile, File datasetFile, int k) throws ClassNotFoundException, IOException {
+		// loads pivots
 		pivots = new Pivots(pivotsFile);
-		this.topKSearch = topKSearch;
+		topKSearch = k;
 		
-		RestClientBuilder builder = RestClient.builder(new HttpHost("localhost",9200,"http"));
-		client = new RestHighLevelClient(builder);
-		
-		//Optional part:
-		imgDescMap = new HashMap<String,ImgDescriptor>();
-		List<ImgDescriptor>descriptors = FeaturesStorage.load(Parameters.STORAGE_FILE);
+		// loads extracted features and initialized imgDescMap with couples <imageID, descriptor>
+		imgDescMap = new HashMap<String, ImgDescriptor>();
+		List<ImgDescriptor> descriptors = FeaturesStorage.load(datasetFile);
 		for(ImgDescriptor el:descriptors) {
 			imgDescMap.put(el.getId(), el);
 		}
+		
+		// initializes the REST client to interact with Elasticsearch
+		RestClientBuilder builder = RestClient.builder(new HttpHost("localhost", 9200, "http"));
+		client = new RestHighLevelClient(builder);
 	}
 	
-	//TODO
+	// closes the REST client
 	public void close() throws IOException {
-		//close REST client
+		client.close();
 	}
 	
-	//TODO
+	// searches for the k most similar images to queryF
 	public List<ImgDescriptor> search(ImgDescriptor queryF, int k) throws ParseException, IOException, ClassNotFoundException{
 		List<ImgDescriptor> res = new ArrayList<ImgDescriptor>();
+		String id, imgTxt, foodClass;
+		ImgDescriptor imgD;		
 		
-		//convert queryF to text
-		String queryString = pivots.features2Text(queryF, k);
+		// converts the queryF to text format using pivots
+		String queryTxt = pivots.features2Text(queryF, k);
 		
-		//call composeSearch to get SearchRequest object
+		System.out.println("-- DEBUG -- Text format of the query: " + queryTxt);
 		
-		SearchRequest sr = composeSearch(queryString,k);
+		// creates the search object		
+		SearchRequest sr = composeSearch(queryTxt, k);
 		
-		
-		//perform elasticsearch search 
-		SearchResponse searchResponse = client.search(sr,RequestOptions.DEFAULT); 
+		// performs search on Elasticsearch
+		SearchResponse searchResponse = client.search(sr, RequestOptions.DEFAULT); 
 		SearchHit[] hits = searchResponse.getHits().getHits();
-		
-		
-		//LOOP to fill res
-			//for each result retrieve the ImgDescriptor from imgDescMap and call setDist to set the score
-		String id;
-		String imgTxt;
-		ImgDescriptor imgD;
-		String foodClass;
-		
-		for (int i = 0; i < hits.length; i++) {
-			Map<String,Object> metadata = hits[i].getSourceAsMap();
+	
+		// for each result retrieves the corresponding ImgDescriptor from imgDescMap and call setDist to set the score
+		for(int i = 0; i < hits.length; i++) {
+			Map<String, Object> metadata = hits[i].getSourceAsMap();
+			
+			// retrieves the id
 			id = (String)metadata.get(Fields.ID);
+			
+			// retrieves the text format
 			imgTxt = (String)metadata.get(Fields.IMG);
+			
+			// retrieves the class
 			foodClass = (String)metadata.get(Fields.FOOD_CLASS);
 			
-			//System.out.println("ID: "+ id + "\t IMG_TXT:" + imgTxt + "\t CLASS: " + foodClass);
+			System.out.println("-- DEBUG -- Result " + i + " - ID: "+ id + "\t Text format: " + imgTxt + "\t Class: " + foodClass);
 			
+			// retrieves the corresponding ImgDescriptor from the set of all image descriptors imgDescMap
 			imgD = imgDescMap.get(id);
-			
-			ImgDescriptor el = new ImgDescriptor(imgD.getFeatures(),id, foodClass);
-			res.add(el);
-			
+			res.add(imgD);		
 		}		
-		
-		
 		return res;
 	}
 	
-	//TODO
+	// sets the request for Elasticsearch
 	private SearchRequest composeSearch(String query, int k) {
-		//Initialize SearchRequest and set query and k
+		// initializes the request
 		SearchRequest searchRequest = new SearchRequest(Parameters.INDEX_NAME);
-		QueryBuilder simpleQuery = QueryBuilders.multiMatchQuery(query, Fields.IMG);
-		SearchSourceBuilder sb = new SearchSourceBuilder(); 
 		
+		// sets query 
+		QueryBuilder simpleQuery = QueryBuilders.multiMatchQuery(query, Fields.IMG);
+		
+		SearchSourceBuilder sb = new SearchSourceBuilder(); 	
 		sb.size(k);
 		sb.query(simpleQuery);
+		
 		searchRequest.types("doc");
 		searchRequest.source(sb);
-		
 	    return searchRequest;
 	}
 	
-	//TODO
+	// for each result, evaluates the distance with the query, calls setDist to set the distance, then sorts the results
 	public List<ImgDescriptor> reorder(ImgDescriptor queryF, List<ImgDescriptor> res) throws IOException, ClassNotFoundException {
-		//for each result evaluate the distance with the query, call  setDist to set the distance, then sort the results
-		
 		double dist;
 		for(ImgDescriptor el:res) {
-
 			dist = el.distance(queryF);
 			el.setDist(dist);	
 		}

@@ -17,13 +17,12 @@ public class SeqImageSearch {
 	
 	private static String foodClass;
 		
-	public static void main(String[] args) throws Exception {
-
+	/*public static void main(String[] args) throws Exception {
 		SeqImageSearch searcher = new SeqImageSearch();
 		
 		searcher.open(Parameters.STORAGE_FILE);
 		
-		//Image Query File
+		// image query file
 		File img = new File(Parameters.SRC_FOLDER, "000000005992.jpg");
 		foodClass = "bruschetta";
 		
@@ -32,30 +31,26 @@ public class SeqImageSearch {
 		float[] features = extractor.extract(img, Parameters.DEEP_LAYER);
 		ImgDescriptor query = new ImgDescriptor(features, img.getName(), foodClass);
 				
-		long time = -System.currentTimeMillis();
 		List<ImgDescriptor> res = searcher.search(query, Parameters.K);
-		time += System.currentTimeMillis();
-		//System.out.println("Sequential search time: " + time + " ms");
-		
+			
 		Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML);
-
-	}
+	}*/
 		
+	// loads the extracted features from storageFile and stores them in the descriptors
 	public void open(File storageFile) throws ClassNotFoundException, IOException {
-		descriptors = FeaturesStorage.load(storageFile );
+		descriptors = FeaturesStorage.load(storageFile);
 	}
 	
+	// loops descriptors of features to perform a sequential scan search
+	//	- computes the distance between each descriptor and the query
+	//	- sorts the results
+	//	- returns the k best results
 	public List<ImgDescriptor> search(ImgDescriptor queryF, int k) {
-		long time = -System.currentTimeMillis();
-		for (int i=0;i<descriptors.size();i++){
+		for (int i = 0; i < descriptors.size(); i++) {
 			descriptors.get(i).distance(queryF);
 		}
-		time += System.currentTimeMillis();
-		//System.out.println(time + " ms");
-
 		Collections.sort(descriptors);
 		
 		return descriptors.subList(0, k);
 	}
-
 }
