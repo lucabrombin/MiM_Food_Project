@@ -2,21 +2,28 @@ package it.unipi.ing.mim.deep;
 
 import java.io.Serializable;
 
+// This class implements the image descriptor, composed of:
+// - the id of the image 
+// - the list of extracted features
+// - the name of the class to which the image belongs
+
 public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 
 	private static final long serialVersionUID = 1L;
 	
-	// unique id of the image (usually file name)
+	// unique id of the image (usually its file name)
 	private String id; 
 	
 	// used for sorting purposes
 	private double dist; 
 	
-	// image features
+	// features extracted from the image
 	private float[] normalizedVector; 
 	
+	// class of the image
 	private String foodClass; 
 	
+	// constructor
 	public ImgDescriptor(float[] features, String id, String foodClass) {
 		if (features != null) {
 			float norm2 = evaluateNorm2(features);
@@ -26,30 +33,37 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 		this.foodClass = foodClass;
 	}
 	
+	// returns the id of the image
+	public String getId() {
+		return id;
+	}
+
+	// sets the id of the image
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	// returns the vector of features of the image
 	public float[] getFeatures() {
 		return normalizedVector;
 	}
-	
-    public String getId() {
-		return id;
-	}
-    
-    public void setId(String id) {
-		this.id = id;
-	}
-    
-    public String getFoodClass() {
+
+	// returns the class of the image
+	public String getFoodClass() {
 		return foodClass;
 	}
-
+    
+    // sets the class of the image
     public void setFoodClass(String foodClass) {
 		this.foodClass = foodClass;
 	}
 
+	// returns the computed distance from another image
 	public double getDist() {
 		return dist;
 	}
 
+	// sets the distance from another image
 	public void setDist(double dist) {
 		this.dist = dist;
 	}
@@ -60,10 +74,8 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 		return Double.valueOf(dist).compareTo(arg0.dist);
 	}
 	
-	// evaluates Euclidean distance
+	// evaluates the Euclidean distance
 	public double distance(ImgDescriptor desc) {
-		
-		//System.out.println("Distance");
 		float[] queryVector = desc.getFeatures();
 		
 		dist = 0;
@@ -75,7 +87,7 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 		return dist;
 	}
 	
-	// normalizes values of the vector
+	// normalizes values of the vector of features
 	private float[] getNormalizedVector(float[] vector, float norm) {
 		if (norm != 0) {
 			for (int i = 0; i < vector.length; i++) {
@@ -85,7 +97,7 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 		return vector;
 	}
 	
-	// computes norm2
+	// computes the norm2
 	private float evaluateNorm2(float[] vector) {
 		float norm2 = 0;
 		for (int i = 0; i < vector.length; i++) {
@@ -95,10 +107,4 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 		
 		return norm2;
 	}
-	
-	@Override
-    public String toString() {
-        return "ImgDescriptor [id=" + id + ", dist=" + dist + ", normalizedVector" + normalizedVector.toString() + ", foodClass=" + foodClass + "]";
-    }
-    
 }

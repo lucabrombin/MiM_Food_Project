@@ -23,7 +23,7 @@ import it.unipi.ing.mim.deep.ImgDescriptor;
 import it.unipi.ing.mim.deep.Parameters;
 import it.unipi.ing.mim.deep.tools.FeaturesStorage;
 
-// This class creates the index on Elasticsearch using the previously computed pivots 
+// This class creates the index on Elasticsearch using the previously selected pivots 
 
 public class ElasticImgIndexing implements AutoCloseable {
 	
@@ -35,9 +35,15 @@ public class ElasticImgIndexing implements AutoCloseable {
 	private RestHighLevelClient client;
 		
 	public static void main(String[] args) throws ClassNotFoundException, IOException {
-		try (ElasticImgIndexing esImgIdx = new ElasticImgIndexing(Parameters.PIVOTS_FILE_GOOGLENET, Parameters.STORAGE_FILE, Parameters.TOP_K_IDX)) {
+		try (ElasticImgIndexing esImgIdx = new ElasticImgIndexing(Parameters.PIVOTS_FILE, Parameters.STORAGE_FILE, Parameters.TOP_K_IDX)) {
+			
+			long startTime = System.currentTimeMillis();
+			
 			esImgIdx.createIndex();
 			esImgIdx.index();	
+			
+			long endTime = System.currentTimeMillis();
+			System.out.println("-- DEBUG -- Time required to index (milliseconds): " + (endTime - startTime));
 		}		
 	}
 	
@@ -46,7 +52,7 @@ public class ElasticImgIndexing implements AutoCloseable {
 		// loads pivots 
 		pivots = new Pivots(pivotsFile);
 		
-		// loads extracted features
+		// loads descriptors of images
 		imgDescDataset = FeaturesStorage.load(datasetFile);
 		topKIdx = k;
 		
@@ -77,22 +83,22 @@ public class ElasticImgIndexing implements AutoCloseable {
 		System.out.println("-- DEBUG -- Index created");
 	}
 	
-	// indices all the extracted features into the Elasticsearch index
+	// indices all the extracted features from images in a dataset into the Elasticsearch index
 	public void index() throws IOException {
 		IndexRequest request;
 		
-		// in each request to index a feature are specified:
-		// - the id of the feature
-		// - the text format of the feature, computed using features2text method of Pivots class
-		// - the class of the feature
+		// each request contains:
+		// - the id of the image
+		// - the text corresponding to the image, computed using features2text method of Pivots class
+		// - the class of the image
 		for(ImgDescriptor el: imgDescDataset) {
-			System.out.println("-- DEBUG -- Indexing image " + el.getId());
+			//System.out.println("-- DEBUG -- Indexing image " + el.getId());
 			request = composeRequest(el.getId(), pivots.features2Text(el, topKIdx), el.getFoodClass());
 			client.index(request, RequestOptions.DEFAULT);
 		}
 	}
 	
-	// initializes and fills IndexRequest object with the id, the text format and the class of the feature
+	// initializes and fills IndexRequest object with the id, the text format and the class
 	private IndexRequest composeRequest(String id, String imgTxt, String foodClass){			
 		IndexRequest request = new IndexRequest(Parameters.INDEX_NAME, "doc");
 		

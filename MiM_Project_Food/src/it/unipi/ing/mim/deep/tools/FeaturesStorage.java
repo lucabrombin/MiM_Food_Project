@@ -13,6 +13,7 @@ import java.util.List;
 
 public class FeaturesStorage {
 	
+	// stores descriptors in a file
 	public static void store(List<ImgDescriptor> ids, File storageFile) throws IOException {	
 		storageFile.getParentFile().mkdir();
 		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(storageFile))) { 
@@ -21,12 +22,11 @@ public class FeaturesStorage {
 		 }
 	}
 	
+	// loads descriptors from a file
 	@SuppressWarnings("unchecked")
 	public static List<ImgDescriptor> load(File storageFile) throws IOException, ClassNotFoundException {
-		ArrayList<ImgDescriptor> ids = new ArrayList<>();
 		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(storageFile))) {        
-			ids = (ArrayList<ImgDescriptor>) ois.readObject();
-		}	
-		return ids;
+			return (List<ImgDescriptor>) ois.readObject();	
+		}
 	}
 }

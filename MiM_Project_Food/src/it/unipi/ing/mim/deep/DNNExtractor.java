@@ -23,13 +23,11 @@ public class DNNExtractor {
 	
 	
 	public DNNExtractor() {		
-		//Create the importer of Caffe framework network
-		//Importer importer = createCaffeImporter(new File(Parameters.DEEP_PROTO).getPath(), new File(Parameters.DEEP_MODEL).getPath());
+		//Creates the importer of Caffe framework network
 		net = readNetFromCaffe(new File(Parameters.DEEP_PROTO).getPath(), new File(Parameters.DEEP_MODEL).getPath());
         
         imgSize = new Size(Parameters.IMG_WIDTH, Parameters.IMG_HEIGHT);
-        //System.out.println(imgSize);
-
+        
         if (Parameters.MEAN_VALUES != null) {
 			meanValues = new Scalar(Parameters.MEAN_VALUES[0], Parameters.MEAN_VALUES[1], Parameters.MEAN_VALUES[2], Parameters.MEAN_VALUES[3]);
         }
@@ -43,7 +41,7 @@ public class DNNExtractor {
 	public float[] extract(Mat img, String layer) {
 		resize(img, img, imgSize);
 		
-		// converts Mat to dnn::Blob image batch
+		// converts the image Mat to dnn::Blob image batch
 		Mat inputBlob = blobFromImage(img);
 		
 		// sets the input of the network
@@ -53,7 +51,7 @@ public class DNNExtractor {
 		Mat prob = net.forward(layer);
 		float[] features = new float[(int) prob.total()];
 		
-		// gathers the output of "fc7" layer
+		// gathers the output of the layer
 		((FloatRawIndexer) prob.createIndexer()).get(0, features);
 		return features;
 	}

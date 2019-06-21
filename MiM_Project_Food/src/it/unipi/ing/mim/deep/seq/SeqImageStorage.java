@@ -9,30 +9,34 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-// This class extracts the features of all the images of the dataset
+// This class extracts the features from all the images in a dataset
 
 public class SeqImageStorage {
 
 	public static void main(String[] args) throws Exception {				
 		SeqImageStorage indexing = new SeqImageStorage();			
 	
+		// extracts the features from the images and creates the descriptors
 		List<ImgDescriptor> descriptors = indexing.extractFeatures(Parameters.SRC_FOLDER);		
 		
+		/*CANCELLA
 		for(int i = 0; i < 5; i++) {
-			System.out.print("-- DEBUG -- ");
+			System.out.print("-- DEBUG -- " + descriptors.get(i).getId() + "   ");
 			for(int j = 0; j < descriptors.get(i).getFeatures().length; j++) {
 				System.out.print(descriptors.get(i).getFeatures()[j] + "  ");
 			}			
 			System.out.println();
 		}
-					
-		// stores the extracted features in the specified folder
+		*/
+
+		// stores the list of descriptors in the specified file
 		FeaturesStorage.store(descriptors, Parameters.STORAGE_FILE);
 		
 		System.out.println("-- DEBUG -- Features extracted");
 	}
 	
 	// extracts the features from images stored in the specified folder using a DNNExtractor
+	// creates and returns the list of corresponding descriptor
 	private List<ImgDescriptor> extractFeatures(File imgFolder){
 		List<ImgDescriptor>  descs = new ArrayList<ImgDescriptor>();
 
@@ -43,9 +47,9 @@ public class SeqImageStorage {
 		
 		DNNExtractor extractor = new DNNExtractor();
 		
-		// For each class (dir.length = 101) -- CHANGE 40 with dir.length
+		// Examines each class in the folder
 		for (int k = 0; k < dir.length; k++) {
-			// files is a list containing all the images of a class
+			// files is a list containing all the images of the examined class
 			File[] files = dir[k].listFiles();
 			
 			// foodClass is the name of the class
@@ -56,13 +60,9 @@ public class SeqImageStorage {
 
 			// For each image of the class, extracts the features 
 			for(int i = 0; i < files.length; i++) {
-				//System.out.println(i + " - extracting " + files[i].getName());
+				System.out.println("-- DEBUG -- " + i + " - Extracting features from " + files[i].getName());
 				try {
-					//long time = -System.currentTimeMillis();
 					float[] features = extractor.extract(files[i], Parameters.DEEP_LAYER);
-					//time += System.currentTimeMillis();
-					//System.out.println(time);
-					//System.out.println("-- DEBUG -- Extracting freatures from " + files[i].getName());
 					descs.add(new ImgDescriptor(features, files[i].getName(), foodClass));
 				} catch (Exception e) {
 					e.printStackTrace();

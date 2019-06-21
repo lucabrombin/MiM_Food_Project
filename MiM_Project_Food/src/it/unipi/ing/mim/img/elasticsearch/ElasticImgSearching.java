@@ -28,7 +28,7 @@ import it.unipi.ing.mim.deep.seq.SeqImageSearch;
 import it.unipi.ing.mim.deep.tools.FeaturesStorage;
 import it.unipi.ing.mim.deep.tools.Output;
 
-// This class extracts the features for a given image and search for k most similar images
+// This class extracts the features for a given image and search for the k most similar images
 
 public class ElasticImgSearching implements AutoCloseable {
 
@@ -39,36 +39,13 @@ public class ElasticImgSearching implements AutoCloseable {
 	private int topKSearch;	
 	
 	private Map<String,ImgDescriptor> imgDescMap;
-	
-	//private static String foodClass;
 		
-	/*
-	public static void main(String[] args) throws Exception {	
-		try (ElasticImgSearching imgSearch = new ElasticImgSearching(Parameters.PIVOTS_FILE_GOOGLENET, Parameters.TOP_K_QUERY)) {
-			// image query file
-			File imgQuery = new File(Parameters.FOLDER_QUERY, "1003796.jpg");
-			
-			foodClass = "bruschetta";
-			
-			DNNExtractor extractor = new DNNExtractor();
-			
-			float[] imgFeatures = extractor.extract(imgQuery, Parameters.DEEP_LAYER);
-			
-			ImgDescriptor query = new ImgDescriptor(imgFeatures, imgQuery.getName(), foodClass);
-			
-			List<ImgDescriptor> res = imgSearch.search(query, Parameters.K);
-			
-			Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML_ELASTIC);
-					
-			res = imgSearch.reorder(query, res);
-			Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML_REORDERED);
-		}
-	}*/
-	
 	// constructor
 	public ElasticImgSearching(File pivotsFile, File datasetFile, int k) throws ClassNotFoundException, IOException {
 		// loads pivots
 		pivots = new Pivots(pivotsFile);
+
+		// sets the size of the result
 		topKSearch = k;
 		
 		// loads extracted features and initialized imgDescMap with couples <imageID, descriptor>
@@ -89,23 +66,24 @@ public class ElasticImgSearching implements AutoCloseable {
 	}
 	
 	// searches for the k most similar images to queryF
-	public List<ImgDescriptor> search(ImgDescriptor queryF, int k) throws ParseException, IOException, ClassNotFoundException{
+	public List<ImgDescriptor> search(ImgDescriptor queryF, int k) throws ParseException, IOException, ClassNotFoundException {
 		List<ImgDescriptor> res = new ArrayList<ImgDescriptor>();
 		String id, imgTxt, foodClass;
 		ImgDescriptor imgD;		
 		
-		// converts the queryF to text format using pivots
-		String queryTxt = pivots.features2Text(queryF, k);
+		// evaluates the text format of queryF 
+		String queryTxt = pivots.features2Text(queryF, topKSearch);
 		
-		System.out.println("-- DEBUG -- Text format of the query: " + queryTxt);
+		//System.out.println("-- DEBUG -- Text format of the query: " + queryTxt);
 		
 		// creates the search object		
 		SearchRequest sr = composeSearch(queryTxt, k);
 		
 		// performs search on Elasticsearch
-		SearchResponse searchResponse = client.search(sr, RequestOptions.DEFAULT); 
+		SearchResponse searchResponse = client.search(sr, RequestOptions.DEFAULT);
+		
 		SearchHit[] hits = searchResponse.getHits().getHits();
-	
+			
 		// for each result retrieves the corresponding ImgDescriptor from imgDescMap and call setDist to set the score
 		for(int i = 0; i < hits.length; i++) {
 			Map<String, Object> metadata = hits[i].getSourceAsMap();
@@ -119,7 +97,7 @@ public class ElasticImgSearching implements AutoCloseable {
 			// retrieves the class
 			foodClass = (String)metadata.get(Fields.FOOD_CLASS);
 			
-			System.out.println("-- DEBUG -- Result " + i + " - ID: "+ id + "\t Text format: " + imgTxt + "\t Class: " + foodClass);
+			//System.out.println("-- DEBUG -- Result " + i + " - ID: "+ id + "\t Text format: " + imgTxt + "\t Class: " + foodClass);
 			
 			// retrieves the corresponding ImgDescriptor from the set of all image descriptors imgDescMap
 			imgD = imgDescMap.get(id);
@@ -128,7 +106,7 @@ public class ElasticImgSearching implements AutoCloseable {
 		return res;
 	}
 	
-	// sets the request for Elasticsearch
+	// composes the request for Elasticsearch
 	private SearchRequest composeSearch(String query, int k) {
 		// initializes the request
 		SearchRequest searchRequest = new SearchRequest(Parameters.INDEX_NAME);

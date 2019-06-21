@@ -15,8 +15,8 @@ public class Output {
 		String html = "<html>\n<body>\n<table align='center'>\n";
 
 		for (int i = 0; i < ids.size(); i++) {
-			System.out.println("-- DEBUG -- " + i + " - " + (float) ids.get(i).getDist() + "\t" + ids.get(i).getId() + "\t" +ids.get(i).getFoodClass());
-			 
+			System.out.println(i + " - " + (float) ids.get(i).getDist() + "\t" + ids.get(i).getId() + "\t" +ids.get(i).getFoodClass());
+			
 			if (i % COLUMNS == 0) {
 				if (i != 0)
 					html += "</tr>\n";
@@ -35,7 +35,7 @@ public class Output {
 		
 		try {
 	        string2File(html, outputFile);
-			System.out.println("-- DEBUG -- HTML generated");
+			System.out.print("html generated");
         } catch (IOException e) {
 	        // TODO Auto-generated catch block
 	        e.printStackTrace();
