@@ -38,7 +38,9 @@ public class SeqImageSearch {
 
 	public List<ImgDescriptor> searchHeap(ImgDescriptor queryF, int k) {
 		PriorityQueue<ImgDescriptor> heap = new PriorityQueue<ImgDescriptor>(Collections.reverseOrder());
-        descriptors.forEach((d) -> d.distance(queryF)); 
+		
+		for (int i = 0; i < descriptors.size(); i++)
+			descriptors.get(i).distance(queryF);
 		heap.addAll(descriptors);
 		return new List<ImgDescriptor>(heap).subList(0, k);
 	}
