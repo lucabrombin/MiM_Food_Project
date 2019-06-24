@@ -39,9 +39,14 @@ public class SeqImageSearch {
 	public List<ImgDescriptor> searchHeap(ImgDescriptor queryF, int k) {
 		PriorityQueue<ImgDescriptor> heap = new PriorityQueue<ImgDescriptor>(Collections.reverseOrder());
 		
-		for (int i = 0; i < descriptors.size(); i++)
+		for (int i = 0; i < descriptors.size(); i++) // O(n)
 			descriptors.get(i).distance(queryF);
-		heap.addAll(descriptors);
-		return new List<ImgDescriptor>(heap).subList(0, k);
+
+		heap.addAll(descriptors); // O(n*logn) ? mhh is this useless?
+		
+		ArrayList<ImgDescriptor> topDescriptors = new ArrayList<ImgDescriptor>();
+		for(int i = 0; i<k; i++) // O(k)
+			topDescriptors.add(heap.poll()); 
+		return topDescriptors;
 	}
 }
