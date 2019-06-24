@@ -40,9 +40,7 @@ public class SeqImageSearch {
 		PriorityQueue<ImgDescriptor> heap = new PriorityQueue<ImgDescriptor>(descriptors.size(), Collections.reverseOrder());
 		ArrayList<ImgDescriptor> topDescriptors = new ArrayList<ImgDescriptor>(k);
 
-		for (int i = 0; i < descriptors.size(); i++) // O(n)
-			descriptors.get(i).distance(queryF);
-
+		descriptors.forEach( (d) -> d.distance(queryF));
 		heap.addAll(descriptors); // this is still n*log(n)
 	
 		for(int i = 0; i<k; i++) // O(k)
