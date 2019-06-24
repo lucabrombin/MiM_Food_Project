@@ -43,10 +43,10 @@ public class SeqImageSearch {
 		for (int i = 0; i < descriptors.size(); i++) // O(n)
 			descriptors.get(i).distance(queryF);
 
-		heap.addAll(descriptors); // i hope this is O(n) (but i'm not so sure)
+		heap.addAll(descriptors); // this is still n*log(n)
 		
 		for(int i = 0; i<k; i++) // O(k)
 			topDescriptors.add(heap.poll()); // log(n)
-		return topDescriptors; // in the end it should be O(k*log(n)) 
+		return topDescriptors; // in the end it should be O(k*log(n)) + 2*O(n) => O(k*log(n)) 
 	}
 }
