@@ -42,7 +42,7 @@ public class ServerHTTP {
 	
     public static void main(final String[] args) {  	
     Undertow server = Undertow.builder()
-		.addHttpListener(8100, "localhost")
+		.addHttpListener(8100, "0.0.0.0")
 		.setHandler(path()
 			// creates and handles requests arriving to this endpoint
 			.addPrefixPath( "/endpoint", websocket(new WebSocketConnectionCallback() {
