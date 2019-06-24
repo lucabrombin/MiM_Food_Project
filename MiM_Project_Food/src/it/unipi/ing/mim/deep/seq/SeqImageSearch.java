@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.PriorityQueue;
 
 // This class is used to select the most similar images to a certain image query
 
@@ -33,5 +34,15 @@ public class SeqImageSearch {
 		Collections.sort(descriptors);
 		
 		return descriptors.subList(0, k);
+	}
+
+	public List<ImgDescriptor> searchHeap(ImgDescriptor queryF, int k) {
+		PriorityQueue<double> heap = new PriorityQueue<double>(Collections.reverseOrder());
+
+		for (int i = 0; i < descriptors.size(); i++) {
+			descriptors.get(i).distance(queryF);
+			heap.add(descriptors.get(i).getDist());
+		}
+		return new List<ImgDescriptor>(heap).subList(0, k);
 	}
 }
