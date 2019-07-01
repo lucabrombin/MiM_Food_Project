@@ -42,7 +42,7 @@ public class ServerHTTP {
 	
     public static void main(final String[] args) {  	
     Undertow server = Undertow.builder()
-		.addHttpListener(8100, "0.0.0.0")
+		.addHttpListener(8100, "localhost")
 		.setHandler(path()
 			// creates and handles requests arriving to this endpoint
 			.addPrefixPath( "/endpoint", websocket(new WebSocketConnectionCallback() {
@@ -52,9 +52,7 @@ public class ServerHTTP {
 				channel.getReceiveSetter().set( new AbstractReceiveListener() {
     			
 					@Override
-		            protected void onFullTextMessage(WebSocketChannel channel, BufferedTextMessage message) throws IOException {
-						long startTime = System.currentTimeMillis();
-						
+		            protected void onFullTextMessage(WebSocketChannel channel, BufferedTextMessage message) throws IOException {					
 						numberOfRequest++;
 		            	System.out.println("-- DEBUG -- Number of requests: " + numberOfRequest);
 		                
@@ -75,44 +73,54 @@ public class ServerHTTP {
 		                try(ElasticImgSearching imgSearch = new ElasticImgSearching(Parameters.PIVOTS_FILE, Parameters.STORAGE_FILE, Parameters.TOP_K_QUERY)) {
 		                	
 		                	System.out.println("-- DEBUG -- Searching for similar images...");
-		             
+		                	
 		                	// saves the received image in a file
 		                	File imageQueryFile = new File("./receivedQuery" + Integer.toString(numberOfRequest) + ".jpg");
 		                	ImageIO.write(queryImage, "jpg", imageQueryFile);
+		                	
+		                	long startTime = System.currentTimeMillis();
 		                	
 		        			DNNExtractor extractor = new DNNExtractor();
 		        			
 		        			// extracts features from the query
 		        			float[] imgFeatures = extractor.extract(imageQueryFile, Parameters.DEEP_LAYER);
+		        			
+		        			long endTime = System.currentTimeMillis();
+		        			System.out.println("-- DEBUG -- Time required to extract the features: " + (endTime - startTime));
+		        			startTime = System.currentTimeMillis();
 		        		
 		        			// the last parameter is used to define the class of the query, it will be updated after the knn classification
-		        			ImgDescriptor query = new ImgDescriptor(imgFeatures, imageQueryFile.getName(), null);                      				
+		        			ImgDescriptor query = new ImgDescriptor(imgFeatures, imageQueryFile.getName(), null);     
+		        			imageQueryFile.delete();
 		        					        			
 		        			// finds the k most similar images to the given query
 							List<ImgDescriptor> res = imgSearch.search(query, Parameters.K);
-	
+							
 							// Orders result according to distance from the query 
 		        			System.out.println("-- DEBUG -- Reordering...");
 		        			res = imgSearch.reorder(query, res); 
-		
-		        			long startTimeKnn = System.currentTimeMillis();
+		        			
+		        			endTime = System.currentTimeMillis();
+		        			System.out.println("-- DEBUG -- Time required to search similar images: " + (endTime - startTime));
+		        			startTime = System.currentTimeMillis();
 							
 		        			// classifies the query using the results of the search operation 
 		        			KnnClassifier knn = new KnnClassifier();
-		        			//Map<String, Double> sortedListedClasses = knn.classify(res);
-		        			Map<String, Double> sortedListedClasses = knn.weightedClassify(res, query);
+		        			Map<String, Double> sortedListedClasses = knn.classify(res);
+		        			//Map<String, Double> sortedListedClasses = knn.weightedClassify(res, query);
 		        			
 		        			System.out.println("-- DEBUG -- Predicted class: " + knn.getPredictedClass());
 		        			query.setFoodClass(knn.getPredictedClass());
 		        			
-		        			long endTimeKnn = System.currentTimeMillis();
-		        			System.out.println("-- DEBUG -- Time required to perform KNN (in milliseconds): " + (endTimeKnn - startTimeKnn));
-
+		        			endTime = System.currentTimeMillis();
+		        			System.out.println("-- DEBUG -- Time required to perform KNN classification: " + (endTime - startTime));
+		        			startTime = System.currentTimeMillis();
+							
 		        			// creates the response message for the client
 							messageData = myServer.createJSON(sortedListedClasses, res, knn.getPredictedClass()); 
 							
-							long endTime = System.currentTimeMillis();
-							System.out.println("-- DEBUG -- Time required to search (in milliseconds): " + (endTime - startTime));
+							endTime = System.currentTimeMillis();
+							System.out.println("-- DEBUG -- Time required to create the JSON response: " + (endTime - startTime));
 		                } catch (ClassNotFoundException | ParseException e) {
 							e.printStackTrace();
 						} finally {
@@ -121,8 +129,6 @@ public class ServerHTTP {
 		                    for(WebSocketChannel session : channel.getPeerConnections()) {
 		                        WebSockets.sendText(messageData, session, null);
 		                    }
-		                    //time += System.currentTimeMillis();
-		                    //System.out.println("ENDED IN: " + time + " MS");
 		                }
 					}
 				});
@@ -170,21 +176,22 @@ public class ServerHTTP {
 		// - a list of the IDs of all images (detected by the search on Elasticsearch) that belong to that class
 		for(Map.Entry<String, Double> entry : sortedListedClasses.entrySet()) {
 			similarFood = new JsonObject();
-			foodClass = entry.getKey();
+			foodClass = entry.getKey();		
 			similarFood.addProperty("class", foodClass);
 			similarFood.addProperty("confidence", entry.getValue());
+			//System.out.println("-- DEBUG -- Class: " + foodClass + ", confidence: " + entry.getValue());
 				
 			List<ImgDescriptor> listImages = res.stream().filter(p -> p.getFoodClass().equals(entry.getKey())).collect(Collectors.toList());			
-			//System.out.println("-- DEBUG -- Food class: " + foodClass + "   " + listImages.size() + " elements of the class: " + listImages);
 			
-			if(foodClass.equals(predictedClass))  
-				bestResult = res.get(0).getId();
-			//System.out.println("-- DEBUG -- " + res.get(0));
-			//System.out.println("-- DEBUG -- " + res.get(0).getId());
-					
+			if(foodClass.equals(predictedClass)) {
+				bestResult = listImages.get(0).getId();
+				//System.out.println("-- DEBUG -- Best result: " + res.get(0).getId());
+			}
+			
 			JsonArray urls = new JsonArray();
 			for(int i = 0; i < listImages.size(); i++) {
 				urls.add(listImages.get(i).getId());
+				//System.out.println("-- DEBUG -- List images: " + listImages.get(i).getId());
 			}
 			similarFood.add("imgs", urls);
 			
@@ -197,7 +204,7 @@ public class ServerHTTP {
 		//json object is converted to string to sent it to the client
 		messageData = result.toString();
 		
-		System.out.println("-- DEBUG -- Messaggio: " + messageData);
+		System.out.println("-- DEBUG -- Message: " + messageData);
 		return messageData;
 	}
 }
