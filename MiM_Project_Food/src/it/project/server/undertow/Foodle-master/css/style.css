@@ -22,21 +22,40 @@ h1 {
   font-size: 40px;
 }
 
+h3 {
+  text-align: left;
+  padding-left: 20px;
+  color: #5d6368;
+  text-transform: capitalize;
+  margin-bottom: 5px;
+}
+
 .pill_button {
   border-radius: 30px;
-  background: rgb(35, 219, 157);
-  border: 2px solid rgb(78, 195, 156);
-  color: rgb(255, 255, 255);
+  background: white;
+  border: 2px solid rgb(35, 219, 157);
+  color: rgb(36, 219, 158);
   font-size: 16px;
   padding: 12px;
   outline: none;
   cursor: pointer;
   font-weight: bolder;
   box-shadow: 3px 3px 15px 0px rgba(111, 111, 111, 0.32);
+  transition: all 0.3s ease-in-out;
 }
 
 .pill_button:hover {
   box-shadow: 3px 17px 20px 6px rgba(111, 111, 111, 0.21);
+  background-color: #24db9e;
+  color: white;
+  margin-top: -2px;
+  border-color: white;
+}
+
+.pill_button:active {
+  /* border-style: inherit; */
+  margin-top: 2px;
+  background: #2b9471;
 }
 
 .pill_button:i {
@@ -118,6 +137,11 @@ h1 {
   margin: 0 auto;
 
   overflow: hidden;
+  text-align: left;
+}
+
+.card:hover {
+  cursor: pointer;
 }
 
 h2 {
@@ -154,6 +178,7 @@ header h1 {
   letter-spacing: normal;
   -webkit-font-smoothing: antialiased;
   text-transform: capitalize;
+  text-shadow: 1px 1px 3px #00000075;
 }
 
 
@@ -176,6 +201,61 @@ header .card {
   background-size: cover;
   border: 1px solid whitesmoke;
 }
+
+#best_result .label {
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: #60dc9e;
+  text-align: left;
+  padding: 0px 12px;
+  background: #fffffff7;
+  border: 2px solid;
+  width: auto;
+  display: inline-block;
+  margin: 10px;
+  border-radius: 10px;
+  letter-spacing: 1px;
+  font-variant: all-small-caps;
+  padding: 1px 5px 5px 5px;
+}
+
+.collection {
+  list-style: none;
+  /* min-height: 75vh; */
+  padding: 0;
+  /* padding: 8px; */
+  margin-bottom: 20px;
+  display: flex;
+  overflow-x: scroll;
+  overflow-y: visible;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  margin-top: 0;
+  /* height: auto; */
+}
+
+.collection .card {
+  width: 40vw;
+  height: 35vw;
+  /* float: left; */
+  /* margin: 12px; */
+  /* margin: 12px auto; */
+  background-position: center;
+  background-size: cover;
+  /* float: left; */
+  /* margin: auto; */
+  /* flex-direction: column; */
+  /* flex-wrap: nowrap; */
+  flex: none;
+  margin: 0px 12px;
+  text-align: left;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.collection .card:hover {
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
 
 #collection {
   list-style: none;
@@ -205,10 +285,11 @@ header .card {
   flex: none;
   margin: 0px 12px;
   text-align: left;
+  transition: box-shadow 0.3s ease-in-out;
 }
 
 #collection .card:hover {
-  box-shadow: 3px 17px 20px 9px rgba(111, 111, 111, 0.21);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
 .card .label {
@@ -227,6 +308,18 @@ header .card {
   font-variant: all-small-caps;
   padding: 1px 5px 5px 5px;  
 }
+
+.confidence {
+  text-align: left;
+  padding-left: 20px;
+  margin-top: 0px;
+  color: gray;
+  font-weight: 700;
+  -webkit-font-smoothing: antialiased;
+}
+
+
+
 
 
 

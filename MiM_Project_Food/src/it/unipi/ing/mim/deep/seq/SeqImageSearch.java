@@ -10,52 +10,41 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.PriorityQueue;
+
+// This class is used to select the most similar images to a certain image query
 
 public class SeqImageSearch {
 
 	private List<ImgDescriptor> descriptors;
-	
-	private static String foodClass;
 		
-	public static void main(String[] args) throws Exception {
-
-		SeqImageSearch searcher = new SeqImageSearch();
-		
-		searcher.open(Parameters.STORAGE_FILE);
-		
-		//Image Query File
-		File img = new File(Parameters.SRC_FOLDER, "000000005992.jpg");
-		foodClass = "bruschetta";
-		
-		DNNExtractor extractor = new DNNExtractor();
-		
-		float[] features = extractor.extract(img, Parameters.DEEP_LAYER);
-		ImgDescriptor query = new ImgDescriptor(features, img.getName(), foodClass);
-				
-		long time = -System.currentTimeMillis();
-		List<ImgDescriptor> res = searcher.search(query, Parameters.K);
-		time += System.currentTimeMillis();
-		//System.out.println("Sequential search time: " + time + " ms");
-		
-		Output.toHTML(res, Parameters.BASE_URI, Parameters.RESULTS_HTML);
-
-	}
-		
+	// loads from storageFile of pivots
 	public void open(File storageFile) throws ClassNotFoundException, IOException {
-		descriptors = FeaturesStorage.load(storageFile );
+		descriptors = FeaturesStorage.load(storageFile);
 	}
 	
+	// loops pivots to perform a sequential scan search
+	//	- computes the distance between each pivot descriptor and the query
+	//	- sorts the results
+	//	- returns the k best results
 	public List<ImgDescriptor> search(ImgDescriptor queryF, int k) {
-		long time = -System.currentTimeMillis();
-		for (int i=0;i<descriptors.size();i++){
+		for (int i = 0; i < descriptors.size(); i++) 
 			descriptors.get(i).distance(queryF);
-		}
-		time += System.currentTimeMillis();
-		System.out.println(time + " ms");
-
+		
 		Collections.sort(descriptors);
 		
 		return descriptors.subList(0, k);
 	}
 
+	public List<ImgDescriptor> searchHeap(ImgDescriptor queryF, int k) {
+		PriorityQueue<ImgDescriptor> heap = new PriorityQueue<ImgDescriptor>(descriptors.size(), Collections.reverseOrder());
+		ArrayList<ImgDescriptor> topDescriptors = new ArrayList<ImgDescriptor>(k);
+
+		descriptors.forEach( (d) -> d.distance(queryF));
+		heap.addAll(descriptors); // this is still n*log(n)
+	
+		for(int i = 0; i<k; i++) // O(k)
+			topDescriptors.add(heap.poll()); // log(n)
+		return topDescriptors;
+	}
 }

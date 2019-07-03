@@ -1,0 +1,1 @@
+qui dentro ci vanno le cartelle che contengolo le immagini (il nome della cartella corrisponde alla classe)

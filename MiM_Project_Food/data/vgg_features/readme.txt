@@ -1,0 +1,1 @@
+qui dentro ci vanno le feature estratte con VGG_16_layers.caffemodel

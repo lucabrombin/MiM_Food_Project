@@ -11,62 +11,74 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+// This class selects random pivots from features
+// Pivots are used to build the index on Elasticsearch
+
 public class Pivots {
 	
 	private SeqImageSearch seqPivots = new SeqImageSearch();
 	
-	//TODO
-	public Pivots(File pivotsFile) throws ClassNotFoundException, IOException {
-		//Load the pivots file
-		seqPivots.open(pivotsFile);
-	}
-
 	public static void main(String[] args) throws ClassNotFoundException, IOException {
+		// loads the image descriptors in the ids list
 		List<ImgDescriptor> ids = FeaturesStorage.load(Parameters.STORAGE_FILE);
+		
+		/*CANCELLA
+		for(int i = 0; i < 5; i++) {
+			System.out.print("-- DEBUG -- " + ids.get(i).getId() + "  ");
+			for(int j = 0; j < ids.get(i).getFeatures().length; j++) {
+				System.out.print(ids.get(i).getFeatures()[j] + "  ");
+			}			
+			System.out.println();
+		}
+		*/
+		
+		// selects NUM_PIVOTS random pivots
 		List<ImgDescriptor> pivs = Pivots.makeRandomPivots(ids, Parameters.NUM_PIVOTS);
+		
+		// stores the extracted pivots in the specified file
 		FeaturesStorage.store(pivs, Parameters.PIVOTS_FILE);
 		
-		System.out.println("PIVOT SELECTED");
+		System.out.println("-- DEBUG -- Pivots selected");
 	}
 	
-	//TODO
+	// constructor: loads the pivots file
+	public Pivots(File pivotsFile) throws ClassNotFoundException, IOException {
+		seqPivots.open(pivotsFile);
+	}
+	
+	// selects nPivs random pivots from the list ids 
 	public static List<ImgDescriptor> makeRandomPivots(List<ImgDescriptor> ids, int nPivs) {
-		
 		ArrayList<ImgDescriptor> pivots = new ArrayList<ImgDescriptor>();
 		ImgDescriptor tmpPivot;
+		
+		// random permutation of the list of descriptors 
 		Collections.shuffle(ids);
 		
-		//LOOP
-		//Create nPivs random pivots and add them in the pivots List
+		// the id of each pivot is its position in the list
 		for(int i = 0; i <= nPivs; i++) {
 			tmpPivot = ids.get(i);
 			tmpPivot.setId(Integer.toString(i));
-			
 			pivots.add(tmpPivot);
 		}
-
 		return pivots;
 	}
 	
-	//TODO
-	public String features2Text(ImgDescriptor imgF, int topK) {
-		
+	// evaluates the text representation of the image imgF using pivots
+	// performs a sequential search to get the topK most similar pivots to imgF and uses them to create the string
+	public String features2Text(ImgDescriptor imgF, int topK) {	
 		StringBuilder sb = new StringBuilder();
-		//perform a sequential search to get the topK most similar pivots
+			
+		// topKPivots contains the topK most similar pivots in decreasing order
 		List<ImgDescriptor> topKPivots = seqPivots.search(imgF, topK);
-		
-		//System.out.println(topKPivots.size());
-		
-		//LOOP
-			//compose the text string using pivot ids
-		
-		for(int j = 0; j < topKPivots.size(); j++) 
-			for(int i = 0; i<topK-j; i++)
+	
+		// composes the string using pivot ids	
+		// the id of the j-th pivot is repeated (topK - j) times in the string 
+		for(int j = 0; j < topK; j++) 
+			for(int i = 0; i < (topK - j); i++)
 				sb.append(topKPivots.get(j).getId() + " ");
 	
-		//System.out.println("features2Text: " + sb.toString());
+		//System.out.println("-- DEBUG -- Pivot string for the image " + sb.toString());
 		
 		return sb.toString();
 	}
-	
 }
