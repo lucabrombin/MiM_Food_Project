@@ -108,14 +108,16 @@ function submit_picture(){
       var ctx = canvas.getContext("2d");
 
       img.src = fileLoadedEvent.target.result;
-      canvas.width = IMG_WIDTH;
-      canvas.height = IMG_HEIGHT;
-      ctx.drawImage(img, 0, 0, IMG_WIDTH, IMG_HEIGHT);
+      img.onload = function() {
+        canvas.width = IMG_WIDTH;
+        canvas.height = IMG_HEIGHT;
+        ctx.drawImage(img, 0, 0, IMG_WIDTH, IMG_HEIGHT);
 
-      var srcData = canvas.toDataURL("image/png");
+        var srcData = canvas.toDataURL("image/png");
 
-      socket.send(srcData)
-      toggle_loading();
+        socket.send(srcData)
+        toggle_loading();
+      }
     }
     fileReader.readAsDataURL(fileToLoad);
   }
