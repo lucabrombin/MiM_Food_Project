@@ -110,7 +110,7 @@ function submit_picture(){
       img.src = fileLoadedEvent.target.result;
       canvas.width = IMG_WIDTH;
       canvas.height = IMG_HEIGHT;
-      ctx.drawImage(img, 0, 0, width, height);
+      ctx.drawImage(img, 0, 0, IMG_WIDTH, IMG_HEIGHT);
 
       var srcData = canvas.toDataURL("image/png");
 
