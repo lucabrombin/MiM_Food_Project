@@ -113,7 +113,7 @@ function submit_picture(){
         canvas.height = IMG_HEIGHT;
         ctx.drawImage(img, 0, 0, IMG_WIDTH, IMG_HEIGHT);
 
-        var srcData = canvas.toDataURL("image/png");
+        var srcData = canvas.toDataURL("image/jpeg");
 
         socket.send(srcData)
         toggle_loading();
