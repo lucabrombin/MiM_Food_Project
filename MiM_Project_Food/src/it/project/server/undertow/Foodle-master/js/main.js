@@ -2,6 +2,8 @@ var test_msg = '{"imgs":[{"img":"803481.jpg","classe":"beef_carpaccio"},{"img":"
 var best_result = {};
 var related_food = {};
 
+var IMG_HEIGHT = 224, IMG_WIDTH = 224;
+
 var socket;
 
 if (window.WebSocket) {
@@ -67,7 +69,17 @@ function submit_picture(){
     var fileReader = new FileReader();
 
     fileReader.onload = function(fileLoadedEvent) {
-      var srcData = fileLoadedEvent.target.result; // <--- data: base64
+      var img = new Image();
+      var canvas = document.createElement("canvas");
+      var ctx = canvas.getContext("2d");
+
+      img.src = fileLoadedEvent.target.result;
+      canvas.width = IMG_WIDTH;
+      canvas.height = IMG_HEIGHT;
+      ctx.drawImage(img, 0, 0, width, height);
+
+      var srcData = canvas.toDataURL("image/png");
+
       socket.send(srcData)
       toggle_loading();
     }
