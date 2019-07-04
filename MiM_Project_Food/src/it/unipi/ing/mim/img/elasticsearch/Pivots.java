@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 // This class selects random pivots from features
 // Pivots are used to build the index on Elasticsearch
@@ -22,15 +23,11 @@ public class Pivots {
 		// loads the image descriptors in the ids list
 		List<ImgDescriptor> ids = FeaturesStorage.load(Parameters.STORAGE_FILE);
 		
-		/*CANCELLA
 		for(int i = 0; i < 5; i++) {
-			System.out.print("-- DEBUG -- " + ids.get(i).getId() + "  ");
-			for(int j = 0; j < ids.get(i).getFeatures().length; j++) {
-				System.out.print(ids.get(i).getFeatures()[j] + "  ");
-			}			
+			System.out.println(ids.get(i).getFeatures().length);		
 			System.out.println();
 		}
-		*/
+		
 		
 		// selects NUM_PIVOTS random pivots
 		List<ImgDescriptor> pivs = Pivots.makeRandomPivots(ids, Parameters.NUM_PIVOTS);
@@ -52,11 +49,12 @@ public class Pivots {
 		ImgDescriptor tmpPivot;
 		
 		// random permutation of the list of descriptors 
-		Collections.shuffle(ids);
+		Collections.shuffle(ids, new Random(42));
 		
 		// the id of each pivot is its position in the list
 		for(int i = 0; i <= nPivs; i++) {
 			tmpPivot = ids.get(i);
+			System.out.println(ids.get(i).getId());
 			tmpPivot.setId(Integer.toString(i));
 			pivots.add(tmpPivot);
 		}
@@ -76,7 +74,7 @@ public class Pivots {
 		for(int j = 0; j < topK; j++) 
 			for(int i = 0; i < (topK - j); i++)
 				sb.append(topKPivots.get(j).getId() + " ");
-	
+		
 		//System.out.println("-- DEBUG -- Pivot string for the image " + sb.toString());
 		
 		return sb.toString();
